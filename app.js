@@ -1,10 +1,14 @@
 //const createError = require('http-errors');
+require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const models = require('./models/index');
 const routes = require('./routes/index');
 
 const app = express();
+
+models.connectToDatabase();
 
 app.use(logger('dev'));
 app.use(express.json());
