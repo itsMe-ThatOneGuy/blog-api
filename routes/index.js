@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
+const users = require('./users');
+const posts = require('./posts');
+const comments = require('./comments');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-module.exports = router;
+module.exports = {
+	users,
+	posts,
+	comments,
+};
