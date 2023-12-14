@@ -2,7 +2,7 @@ const models = require('../models/index');
 const asyncHandler = require('express-async-handler');
 
 exports.get_all_posts = asyncHandler(async (req, res) => {
-	const allPosts = await Post.find({});
+	const allPosts = await models.Post.find({}).populate('comments');
 	return res.json(allPosts);
 });
 
@@ -17,19 +17,21 @@ exports.post_create_post = asyncHandler(async (req, res) => {
 });
 
 exports.get_single_post = asyncHandler(async (req, res) => {
-	const post = await models.Post.findById(req.params.id);
+	const post = await models.Post.findById(req.params.postId).populate(
+		'comments',
+	);
 	return res.json(post);
 });
 
 exports.put_update_post = asyncHandler(async (req, res) => {
 	const post = new models.Post({
-		_id: req.params.id,
+		_id: req.params.postId,
 		user: req.context.user,
 		title: req.body.title,
 		body: req.body.body,
 	});
 	const updatedPost = await models.Post.findByIdAndUpdate(
-		req.params.id,
+		req.params.postId,
 		post,
 		{},
 	);
@@ -37,6 +39,6 @@ exports.put_update_post = asyncHandler(async (req, res) => {
 });
 
 exports.delete_post = asyncHandler(async (req, res) => {
-	const removedPost = await Post.findByIdAndDelete(req.params.id);
+	const removedPost = await models.Post.findByIdAndDelete(req.params.id);
 	return res.json(`Deleted ${removedPost}`);
 });
