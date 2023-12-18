@@ -7,7 +7,7 @@ const passport = require('passport');
 exports.test_auth = [
 	passport.authenticate('jwt', { session: false }),
 	(req, res) => {
-		return res.json('AUTH WORKED');
+		return res.json({ message: 'AUTH WORKED', user: req.user });
 	},
 ];
 
@@ -29,10 +29,14 @@ exports.login_user = asyncHandler(async (req, res) => {
 		}).exec();
 		const password = await bcrypt.compare(req.body.password, user.password);
 		if (user && password) {
-			token = jwt.sign({ username: user.username }, 'SECRET_KEY', {
-				expiresIn: 120,
-			});
-			res.json({ token: token, username: user.username });
+			token = jwt.sign(
+				{ sub: user._id, username: user.username },
+				process.env.JWT_TOKEN_KEY,
+				{
+					expiresIn: 120,
+				},
+			);
+			res.json({ token: token });
 		} else {
 			res.json({ message: 'Username or Password incorrect' });
 		}
