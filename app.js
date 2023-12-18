@@ -6,6 +6,9 @@ const logger = require('morgan');
 const models = require('./models/index');
 const routes = require('./routes/index');
 
+const passport = require('passport');
+const initPassport = require('./helper/passport');
+
 const app = express();
 
 models.connectToDatabase();
@@ -15,9 +18,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+initPassport(passport);
+
 app.use('/user', routes.users);
 app.use('/posts', routes.posts);
-app.use('/comments', routes.comments);
 
 /* // catch 404 and forward to error handler
 app.use(function (req, res, next) {
