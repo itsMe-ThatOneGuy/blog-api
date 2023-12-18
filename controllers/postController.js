@@ -40,17 +40,29 @@ exports.put_update_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
+		const currentPost = await models.Post.findById(req.params.postId);
+
 		const post = new models.Post({
 			_id: req.params.postId,
+			user: currentPost.user,
 			title: req.body.title,
 			body: req.body.body,
+			comments: currentPost.comments,
+			published: currentPost.published,
+			postDate: currentPost.postDate,
 		});
+
 		const updatedPost = await models.Post.findByIdAndUpdate(
 			req.params.postId,
 			post,
 			{},
-		);
-		return res.json(updatedPost);
+		)
+			.populate('user', 'username')
+			.populate({
+				path: 'comments',
+				populate: { path: 'user', select: 'username' },
+			});
+		return res.json({ message: 'UPDATED POST', post: updatedPost });
 	}),
 ];
 
