@@ -70,7 +70,19 @@ exports.delete_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		const post = await models.Post.findById(req.params.postId);
+		const post = await models.Post.findById(req.params.postId)
+			.populate('user', 'username')
+			.populate({
+				path: 'comments',
+				populate: { path: 'user', select: 'username' },
+			});
+
+		if (post.comments.length !== 0) {
+			post.comments.forEach(async (comment) => {
+				await models.Comment.findByIdAndDelete(comment._id);
+			});
+		}
+
 		await models.Post.findByIdAndDelete(req.params.postId);
 		return res.json({ message: 'Deleted Post', post: post });
 	}),
