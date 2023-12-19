@@ -30,7 +30,7 @@ exports.login_user = asyncHandler(async (req, res) => {
 		const password = await bcrypt.compare(req.body.password, user.password);
 		if (user && password) {
 			token = jwt.sign(
-				{ sub: user._id, username: user.username },
+				{ sub: user._id, username: user.username, isAdmin: user.isAdmin },
 				process.env.JWT_TOKEN_KEY,
 				{
 					expiresIn: 120,
