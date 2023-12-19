@@ -6,6 +6,8 @@ const passport = require('passport');
 
 router.get('/', controllers.userController.get_user);
 
+router.post('/refresh', controllers.authController.refresh);
+
 router.post('/test', controllers.authController.test_auth);
 
 router.post('/register', controllers.authController.register_user);
