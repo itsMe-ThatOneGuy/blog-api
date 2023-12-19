@@ -99,3 +99,37 @@ exports.delete_post = [
 		}
 	}),
 ];
+
+exports.change_published = [
+	passport.authenticate('jwt', { session: false }),
+
+	asyncHandler(async (req, res) => {
+		if (req.user.isAdmin) {
+			const currentPost = await models.Post.findById(req.params.postId);
+
+			const post = new models.Post({
+				_id: req.params.postId,
+				user: currentPost.user,
+				title: currentPost.title,
+				body: currentPost.body,
+				comments: currentPost.comments,
+				published: req.body.published,
+				postDate: currentPost.postDate,
+			});
+
+			const updatedPost = await models.Post.findByIdAndUpdate(
+				req.params.postId,
+				post,
+				{},
+			)
+				.populate('user', 'username')
+				.populate({
+					path: 'comments',
+					populate: { path: 'user', select: 'username' },
+				});
+			return res.json({ message: 'UPDATED POST', post: updatedPost });
+		} else {
+			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE POST' });
+		}
+	}),
+];
