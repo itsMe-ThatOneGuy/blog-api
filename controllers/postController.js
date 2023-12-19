@@ -16,13 +16,17 @@ exports.post_create_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		const post = new models.Post({
-			user: req.user.sub,
-			title: req.body.title,
-			body: req.body.body,
-		});
-		await post.save();
-		return res.json({ message: 'CREATED POST', post: post });
+		if (req.user.isAdmin) {
+			const post = new models.Post({
+				user: req.user.sub,
+				title: req.body.title,
+				body: req.body.body,
+			});
+			await post.save();
+			return res.json({ message: 'CREATED POST', post: post });
+		} else {
+			return res.status(403).json({ message: 'NOT AUTHORIZED TO MAKE POSTS' });
+		}
 	}),
 ];
 
@@ -40,29 +44,33 @@ exports.put_update_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		const currentPost = await models.Post.findById(req.params.postId);
+		if (req.user.isAdmin) {
+			const currentPost = await models.Post.findById(req.params.postId);
 
-		const post = new models.Post({
-			_id: req.params.postId,
-			user: currentPost.user,
-			title: req.body.title,
-			body: req.body.body,
-			comments: currentPost.comments,
-			published: currentPost.published,
-			postDate: currentPost.postDate,
-		});
-
-		const updatedPost = await models.Post.findByIdAndUpdate(
-			req.params.postId,
-			post,
-			{},
-		)
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
+			const post = new models.Post({
+				_id: req.params.postId,
+				user: currentPost.user,
+				title: req.body.title,
+				body: req.body.body,
+				comments: currentPost.comments,
+				published: currentPost.published,
+				postDate: currentPost.postDate,
 			});
-		return res.json({ message: 'UPDATED POST', post: updatedPost });
+
+			const updatedPost = await models.Post.findByIdAndUpdate(
+				req.params.postId,
+				post,
+				{},
+			)
+				.populate('user', 'username')
+				.populate({
+					path: 'comments',
+					populate: { path: 'user', select: 'username' },
+				});
+			return res.json({ message: 'UPDATED POST', post: updatedPost });
+		} else {
+			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE POST' });
+		}
 	}),
 ];
 
@@ -70,20 +78,24 @@ exports.delete_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		const post = await models.Post.findById(req.params.postId)
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
-			});
+		if (req.user.isAdmin) {
+			const post = await models.Post.findById(req.params.postId)
+				.populate('user', 'username')
+				.populate({
+					path: 'comments',
+					populate: { path: 'user', select: 'username' },
+				});
 
-		if (post.comments.length !== 0) {
-			post.comments.forEach(async (comment) => {
-				await models.Comment.findByIdAndDelete(comment._id);
-			});
+			if (post.comments.length !== 0) {
+				post.comments.forEach(async (comment) => {
+					await models.Comment.findByIdAndDelete(comment._id);
+				});
+			}
+
+			await models.Post.findByIdAndDelete(req.params.postId);
+			return res.json({ message: 'Deleted Post', post: post });
+		} else {
+			return res.status(403).json({ message: 'NOT AUTHORIZED TO DELETE POST' });
 		}
-
-		await models.Post.findByIdAndDelete(req.params.postId);
-		return res.json({ message: 'Deleted Post', post: post });
 	}),
 ];
