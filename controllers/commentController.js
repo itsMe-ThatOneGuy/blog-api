@@ -54,7 +54,7 @@ exports.put_update_comment = [
 
 			return res.json({ message: 'UPDATE COMMENT', comment: update });
 		} else {
-			return res.statusCode(403).json({ message: 'NOT AUTHORIZED TO UPDATE' });
+			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE' });
 		}
 	}),
 ];
@@ -79,7 +79,7 @@ exports.delete_comment = [
 			);
 			return res.json({ message: 'DELETE COMMENT', comment: comment });
 		} else {
-			return res.statusCode(403).json('NOT AUTHORIZED TO DELETE COMMENT');
+			return res.status(403).json('NOT AUTHORIZED TO DELETE COMMENT');
 		}
 	}),
 ];
