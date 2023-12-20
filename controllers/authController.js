@@ -7,7 +7,9 @@ const passport = require('passport');
 exports.test_auth = [
 	passport.authenticate('jwt', { session: false }),
 	(req, res) => {
-		return res.json({ message: 'AUTH WORKED', user: req.user });
+		return res
+			.status(200)
+			.json({ statusCode: 200, message: 'AUTH WORKED', user: req.user });
 	},
 ];
 
@@ -18,7 +20,7 @@ exports.refresh = [
 		if (!refreshToken) {
 			return res
 				.status(401)
-				.json({ message: 'Access Denied. No refresh token provided' });
+				.json({ statusCode: 401, message: 'ACCESS DENIED, NO REFRESH TOKEN' });
 		}
 
 		try {
@@ -31,12 +33,15 @@ exports.refresh = [
 			const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
 				expiresIn: 120,
 			});
-			res.json({
+			res.status(200).json({
+				statusCode: 200,
 				message: 'ACCESS TOKEN REFRESHED',
 				token: accessToken,
 			});
 		} catch {
-			return res.status(400).json('Invalid refresh token');
+			return res
+				.status(400)
+				.json({ statusCode: 400, message: 'Invalid refresh token' });
 		}
 	}),
 ];
@@ -48,39 +53,40 @@ exports.register_user = asyncHandler(async (req, res) => {
 			password: hashedPassword,
 		});
 		await newUser.save();
-		res.json({ message: 'User created', user: newUser });
+		res
+			.status(200)
+			.json({ statusCode: 200, message: 'User created', user: newUser });
 	});
 });
 
 exports.login_user = asyncHandler(async (req, res) => {
-	try {
-		const user = await models.User.findOne({
-			username: req.body.username,
-		}).exec();
-		const password = await bcrypt.compare(req.body.password, user.password);
+	const user = await models.User.findOne({
+		username: req.body.username,
+	}).exec();
+	const password = await bcrypt.compare(req.body.password, user.password);
 
-		const payload = {
-			sub: user._id,
-			username: user.username,
-			isAdmin: user.isAdmin,
-		};
+	const payload = {
+		sub: user._id,
+		username: user.username,
+		isAdmin: user.isAdmin,
+	};
 
-		if (user && password) {
-			const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
-				expiresIn: 120,
-			});
+	if (user && password) {
+		const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
+			expiresIn: 120,
+		});
 
-			const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
-				expiresIn: '1d',
-			});
+		const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
+			expiresIn: '1d',
+		});
 
-			res
-				.cookie('jwt', refreshToken, { httpOnly: true, secure: false })
-				.json({ token: accessToken, refresh: refreshToken });
-		} else {
-			res.json({ message: 'Username or Password incorrect' });
-		}
-	} catch (err) {
-		console.error(err);
+		res
+			.cookie('jwt', refreshToken, { httpOnly: true, secure: false })
+			.status(200)
+			.json({ statusCode: 200, token: accessToken, refresh: refreshToken });
+	} else {
+		res
+			.status(401)
+			.json({ statusCode: 401, message: 'Username or Password incorrect' });
 	}
 });
