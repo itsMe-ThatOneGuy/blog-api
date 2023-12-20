@@ -1,4 +1,5 @@
 const models = require('../models/index');
+const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const passport = require('passport');
 
@@ -9,7 +10,9 @@ exports.get_all_posts = asyncHandler(async (req, res) => {
 			path: 'comments',
 			populate: { path: 'user', select: 'username' },
 		});
-	return res.status(200).json({ message: 'ALL POSTS', posts: allPosts });
+	return res
+		.status(200)
+		.json({ statusCode: 200, message: 'ALL POSTS', posts: allPosts });
 });
 
 exports.post_create_post = [
@@ -23,21 +26,40 @@ exports.post_create_post = [
 				body: req.body.body,
 			});
 			await post.save();
-			return res.status(200).json({ message: 'CREATED POST', post: post });
+			return res
+				.status(200)
+				.json({ statusCode: 200, message: 'CREATED POST', post: post });
 		} else {
-			return res.status(403).json({ message: 'NOT AUTHORIZED TO MAKE POSTS' });
+			return res
+				.status(403)
+				.json({ statusCode: 403, message: 'NOT AUTHORIZED TO MAKE POSTS' });
 		}
 	}),
 ];
 
 exports.get_single_post = asyncHandler(async (req, res) => {
+	if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+		return res
+			.status(400)
+			.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
+	}
+
 	const post = await models.Post.findById(req.params.postId)
 		.populate('user', 'username')
 		.populate({
 			path: 'comments',
 			populate: { path: 'user', select: 'username' },
 		});
-	return res.status(200).json({ message: 'SELECTED POST', post: post });
+
+	if (post === null) {
+		return res
+			.status(404)
+			.json({ statusCode: 404, message: 'COULD NOT FIND POST' });
+	}
+
+	return res
+		.status(200)
+		.json({ statusCode: 200, message: 'SELECTED POST', post: post });
 });
 
 exports.put_update_post = [
@@ -45,10 +67,18 @@ exports.put_update_post = [
 
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
+			if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+				return res
+					.status(400)
+					.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
+			}
+
 			const currentPost = await models.Post.findById(req.params.postId);
 
 			if (currentPost === null) {
-				return res.status(404).json({ message: 'COULD NOT FIND POST' });
+				return res
+					.status(404)
+					.json({ statusCode: 404, message: 'COULD NOT FIND POST' });
 			}
 
 			const post = new models.Post({
@@ -73,9 +103,11 @@ exports.put_update_post = [
 				});
 			return res
 				.status(200)
-				.json({ message: 'UPDATED POST', post: updatedPost });
+				.json({ statusCode: 200, message: 'UPDATED POST', post: updatedPost });
 		} else {
-			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE POST' });
+			return res
+				.status(403)
+				.json({ statusCode: 403, message: 'NOT AUTHORIZED TO UPDATE POST' });
 		}
 	}),
 ];
@@ -85,6 +117,12 @@ exports.delete_post = [
 
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
+			if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+				return res
+					.status(400)
+					.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
+			}
+
 			const post = await models.Post.findById(req.params.postId)
 				.populate('user', 'username')
 				.populate({
@@ -93,7 +131,9 @@ exports.delete_post = [
 				});
 
 			if (post === null) {
-				return res.status(404).json({ message: 'COULD NOT FIND POST' });
+				return res
+					.status(404)
+					.json({ statusCode: 404, message: 'COULD NOT FIND POST' });
 			}
 
 			if (post.comments.length !== 0) {
@@ -103,9 +143,13 @@ exports.delete_post = [
 			}
 
 			await models.Post.findByIdAndDelete(req.params.postId);
-			return res.status(200).json({ message: 'Deleted Post', post: post });
+			return res
+				.status(200)
+				.json({ statusCode: 200, message: 'Deleted Post', post: post });
 		} else {
-			return res.status(403).json({ message: 'NOT AUTHORIZED TO DELETE POST' });
+			return res
+				.status(403)
+				.json({ statusCode: 403, message: 'NOT AUTHORIZED TO DELETE POST' });
 		}
 	}),
 ];
@@ -115,10 +159,18 @@ exports.change_published = [
 
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
+			if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+				return res
+					.status(400)
+					.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
+			}
+
 			const currentPost = await models.Post.findById(req.params.postId);
 
 			if (post === null) {
-				return res.status(404).json({ message: 'COULD NOT FIND POST' });
+				return res
+					.status(404)
+					.json({ statusCode: 404, message: 'COULD NOT FIND POST' });
 			}
 
 			const post = new models.Post({
@@ -143,9 +195,11 @@ exports.change_published = [
 				});
 			return res
 				.status(200)
-				.json({ message: 'UPDATED POST', post: updatedPost });
+				.json({ statusCode: 200, message: 'UPDATED POST', post: updatedPost });
 		} else {
-			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE POST' });
+			return res
+				.status(403)
+				.json({ statusCode: 403, message: 'NOT AUTHORIZED TO UPDATE POST' });
 		}
 	}),
 ];
