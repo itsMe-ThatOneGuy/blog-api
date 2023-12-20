@@ -15,7 +15,7 @@ exports.get_all_posts = asyncHandler(async (req, res) => {
 		.json({ statusCode: 200, message: 'ALL POSTS', posts: allPosts });
 });
 
-exports.post_create_post = [
+exports.create_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
@@ -62,7 +62,7 @@ exports.get_single_post = asyncHandler(async (req, res) => {
 		.json({ statusCode: 200, message: 'SELECTED POST', post: post });
 });
 
-exports.put_update_post = [
+exports.update_post = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {

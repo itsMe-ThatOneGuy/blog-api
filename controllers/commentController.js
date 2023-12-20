@@ -28,7 +28,7 @@ exports.get_post_comments = asyncHandler(async (req, res) => {
 	});
 });
 
-exports.post_create_comment = [
+exports.create_comment = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
@@ -74,7 +74,7 @@ exports.get_single_comment = asyncHandler(async (req, res) => {
 		.json({ statusCode: 200, message: 'GET SINGLE COMMENT', comment: comment });
 });
 
-exports.put_update_comment = [
+exports.update_comment = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
