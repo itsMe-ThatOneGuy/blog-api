@@ -9,7 +9,7 @@ exports.get_all_posts = asyncHandler(async (req, res) => {
 			path: 'comments',
 			populate: { path: 'user', select: 'username' },
 		});
-	return res.json({ message: 'ALL POSTS', posts: allPosts });
+	return res.status(200).json({ message: 'ALL POSTS', posts: allPosts });
 });
 
 exports.post_create_post = [
@@ -23,7 +23,7 @@ exports.post_create_post = [
 				body: req.body.body,
 			});
 			await post.save();
-			return res.json({ message: 'CREATED POST', post: post });
+			return res.status(200).json({ message: 'CREATED POST', post: post });
 		} else {
 			return res.status(403).json({ message: 'NOT AUTHORIZED TO MAKE POSTS' });
 		}
@@ -37,7 +37,7 @@ exports.get_single_post = asyncHandler(async (req, res) => {
 			path: 'comments',
 			populate: { path: 'user', select: 'username' },
 		});
-	return res.json({ message: 'SELECTED POST', post: post });
+	return res.status(200).json({ message: 'SELECTED POST', post: post });
 });
 
 exports.put_update_post = [
@@ -46,6 +46,10 @@ exports.put_update_post = [
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
 			const currentPost = await models.Post.findById(req.params.postId);
+
+			if (currentPost === null) {
+				return res.status(404).json({ message: 'COULD NOT FIND POST' });
+			}
 
 			const post = new models.Post({
 				_id: req.params.postId,
@@ -67,7 +71,9 @@ exports.put_update_post = [
 					path: 'comments',
 					populate: { path: 'user', select: 'username' },
 				});
-			return res.json({ message: 'UPDATED POST', post: updatedPost });
+			return res
+				.status(200)
+				.json({ message: 'UPDATED POST', post: updatedPost });
 		} else {
 			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE POST' });
 		}
@@ -86,6 +92,10 @@ exports.delete_post = [
 					populate: { path: 'user', select: 'username' },
 				});
 
+			if (post === null) {
+				return res.status(404).json({ message: 'COULD NOT FIND POST' });
+			}
+
 			if (post.comments.length !== 0) {
 				post.comments.forEach(async (comment) => {
 					await models.Comment.findByIdAndDelete(comment._id);
@@ -93,7 +103,7 @@ exports.delete_post = [
 			}
 
 			await models.Post.findByIdAndDelete(req.params.postId);
-			return res.json({ message: 'Deleted Post', post: post });
+			return res.status(200).json({ message: 'Deleted Post', post: post });
 		} else {
 			return res.status(403).json({ message: 'NOT AUTHORIZED TO DELETE POST' });
 		}
@@ -106,6 +116,10 @@ exports.change_published = [
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
 			const currentPost = await models.Post.findById(req.params.postId);
+
+			if (post === null) {
+				return res.status(404).json({ message: 'COULD NOT FIND POST' });
+			}
 
 			const post = new models.Post({
 				_id: req.params.postId,
@@ -127,7 +141,9 @@ exports.change_published = [
 					path: 'comments',
 					populate: { path: 'user', select: 'username' },
 				});
-			return res.json({ message: 'UPDATED POST', post: updatedPost });
+			return res
+				.status(200)
+				.json({ message: 'UPDATED POST', post: updatedPost });
 		} else {
 			return res.status(403).json({ message: 'NOT AUTHORIZED TO UPDATE POST' });
 		}
