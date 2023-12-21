@@ -19,7 +19,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 initPassport(passport);
-
 app.use('/user', routes.users);
 app.use('/posts', routes.posts);
 
