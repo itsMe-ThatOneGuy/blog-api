@@ -4,12 +4,6 @@ const asyncHandler = require('express-async-handler');
 const passport = require('passport');
 
 exports.get_post_comments = asyncHandler(async (req, res) => {
-	if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-		return res
-			.status(400)
-			.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-	}
-
 	const post = await models.Post.findById(req.params.postId).populate({
 		path: 'comments',
 		populate: { path: 'user', select: 'username' },
@@ -32,12 +26,6 @@ exports.create_comment = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-			return res
-				.status(400)
-				.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-		}
-
 		const comment = new models.Comment({
 			user: req.user.sub,
 			body: req.body.body,
@@ -55,12 +43,6 @@ exports.create_comment = [
 ];
 
 exports.get_single_comment = asyncHandler(async (req, res) => {
-	if (!mongoose.Types.ObjectId.isValid(req.params.commentId)) {
-		return res
-			.status(400)
-			.json({ statusCode: 400, message: 'COMMENT ID IS NOT VALID' });
-	}
-
 	const comment = await models.Comment.findById(req.params.commentId);
 
 	if (comment === null) {
@@ -78,12 +60,6 @@ exports.update_comment = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-			return res
-				.status(400)
-				.json({ statusCode: 400, message: 'COMMENT ID IS NOT VALID' });
-		}
-
 		const comment = await models.Comment.findById(req.params.commentId);
 
 		if (comment === null) {
@@ -119,17 +95,6 @@ exports.delete_comment = [
 	passport.authenticate('jwt', { session: false }),
 
 	asyncHandler(async (req, res) => {
-		if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-			return res
-				.status(400)
-				.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-		}
-		if (!mongoose.Types.ObjectId.isValid(req.params.commentId)) {
-			return res
-				.status(400)
-				.json({ statusCode: 400, message: 'COMMENT ID IS NOT VALID' });
-		}
-
 		const comment = await models.Comment.findById(
 			req.params.commentId,
 		).populate('user', 'id');

@@ -2,6 +2,7 @@ const models = require('../models/index');
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const passport = require('passport');
+const idTypeCheck = require('../middleware/idTypeCheck');
 
 exports.get_all_posts = asyncHandler(async (req, res) => {
 	const allPosts = await models.Post.find({})
@@ -38,12 +39,6 @@ exports.create_post = [
 ];
 
 exports.get_single_post = asyncHandler(async (req, res) => {
-	if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-		return res
-			.status(400)
-			.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-	}
-
 	const post = await models.Post.findById(req.params.postId)
 		.populate('user', 'username')
 		.populate({
@@ -67,12 +62,6 @@ exports.update_post = [
 
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
-			if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-				return res
-					.status(400)
-					.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-			}
-
 			const currentPost = await models.Post.findById(req.params.postId);
 
 			if (currentPost === null) {
