@@ -167,25 +167,15 @@ exports.change_published = [
 
 			const currentPost = await models.Post.findById(req.params.postId);
 
-			if (post === null) {
+			if (currentPost === null) {
 				return res
 					.status(404)
 					.json({ statusCode: 404, message: 'COULD NOT FIND POST' });
 			}
 
-			const post = new models.Post({
-				_id: req.params.postId,
-				user: currentPost.user,
-				title: currentPost.title,
-				body: currentPost.body,
-				comments: currentPost.comments,
-				published: req.body.published,
-				postDate: currentPost.postDate,
-			});
-
 			const updatedPost = await models.Post.findByIdAndUpdate(
 				req.params.postId,
-				post,
+				{ $set: { isPublished: req.body.isPublished } },
 				{},
 			)
 				.populate('user', 'username')
@@ -193,9 +183,11 @@ exports.change_published = [
 					path: 'comments',
 					populate: { path: 'user', select: 'username' },
 				});
-			return res
-				.status(200)
-				.json({ statusCode: 200, message: 'UPDATED POST', post: updatedPost });
+			return res.status(200).json({
+				statusCode: 200,
+				message: 'UPDATED POST PUBLISH STATUS',
+				post: updatedPost,
+			});
 		} else {
 			return res
 				.status(403)
