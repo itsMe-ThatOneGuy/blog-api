@@ -8,7 +8,7 @@ router.post('/', controllers.postController.create_post);
 
 router.get('/:postId', controllers.postController.get_single_post);
 
-router.post('/:postId', controllers.postController.change_published);
+router.put('/:postId/published', controllers.postController.change_published);
 
 router.get(
 	'/:postId/comments',
