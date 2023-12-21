@@ -7,7 +7,7 @@ const models = require('./models/index');
 const routes = require('./routes/index');
 
 const passport = require('passport');
-const initPassport = require('./helper/passport');
+const initPassport = require('./helpers/passport');
 
 const app = express();
 
