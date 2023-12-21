@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const controllers = require('../controllers/index');
+const idTypeCheck = require('../middleware/idTypeCheck');
 
-const passport = require('passport');
-
-router.get('/userId', controllers.userController.get_user);
+router.get('/userId', idTypeCheck, controllers.userController.get_user);
 
 router.post('/refresh', controllers.authController.refresh);
 
