@@ -44,8 +44,8 @@ router.put(
 router.delete('/:postId', idTypeCheck, controllers.postController.delete_post);
 
 router.delete(
-	idTypeCheck,
 	'/:postId/comments/:commentId',
+	idTypeCheck,
 	controllers.commentController.delete_comment,
 );
 
