@@ -2,7 +2,6 @@ const models = require('../models/index');
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const passport = require('passport');
-const idTypeCheck = require('../middleware/idTypeCheck');
 
 exports.get_all_posts = asyncHandler(async (req, res) => {
 	const allPosts = await models.Post.find({})
