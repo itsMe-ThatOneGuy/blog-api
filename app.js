@@ -19,8 +19,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 initPassport(passport);
-app.use('/user', routes.users);
-app.use('/posts', routes.posts);
+app.use(
+	'/private',
+	passport.authenticate('jwt', { session: false }),
+	routes.private,
+);
+app.use('/public', routes.public);
+app.use(
+	'/token',
+	passport.authenticate('refresh', { session: false }),
+	routes.refresh,
+);
 
 /* // catch 404 and forward to error handler
 app.use(function (req, res, next) {
