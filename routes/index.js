@@ -1,7 +1,9 @@
-const users = require('./users');
-const posts = require('./posts');
+const private = require('./private');
+const public = require('./public');
+const refresh = require('./refresh');
 
 module.exports = {
-	users,
-	posts,
+	private,
+	public,
+	refresh,
 };
