@@ -76,7 +76,7 @@ exports.update_comment = [
 			const update = await models.Comment.findByIdAndUpdate(
 				req.params.commentId,
 				updatedComment,
-				{},
+				{ new: true },
 			);
 
 			return res
