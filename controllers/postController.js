@@ -1,5 +1,4 @@
 const models = require('../models/index');
-const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 const passport = require('passport');
 
@@ -69,20 +68,12 @@ exports.update_post = [
 					.json({ statusCode: 404, message: 'COULD NOT FIND POST' });
 			}
 
-			const post = new models.Post({
-				_id: req.params.postId,
-				user: currentPost.user,
-				title: req.body.title,
-				body: req.body.body,
-				comments: currentPost.comments,
-				published: currentPost.published,
-				postDate: currentPost.postDate,
-			});
-
 			const updatedPost = await models.Post.findByIdAndUpdate(
 				req.params.postId,
-				post,
-				{},
+				{
+					$set: { title: req.body.title, body: req.body.body },
+				},
+				{ new: true },
 			)
 				.populate('user', 'username')
 				.populate({
@@ -105,12 +96,6 @@ exports.delete_post = [
 
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
-			if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-				return res
-					.status(400)
-					.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-			}
-
 			const post = await models.Post.findById(req.params.postId)
 				.populate('user', 'username')
 				.populate({
@@ -147,12 +132,6 @@ exports.change_published = [
 
 	asyncHandler(async (req, res) => {
 		if (req.user.isAdmin) {
-			if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-				return res
-					.status(400)
-					.json({ statusCode: 400, message: 'POST ID IS NOT VALID' });
-			}
-
 			const currentPost = await models.Post.findById(req.params.postId);
 
 			if (currentPost === null) {
@@ -164,7 +143,7 @@ exports.change_published = [
 			const updatedPost = await models.Post.findByIdAndUpdate(
 				req.params.postId,
 				{ $set: { isPublished: req.body.isPublished } },
-				{},
+				{ new: true },
 			)
 				.populate('user', 'username')
 				.populate({
