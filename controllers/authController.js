@@ -39,8 +39,9 @@ exports.refresh = asyncHandler(async (req, res) => {
 	}
 });
 
-exports.register_user = asyncHandler(async (req, res) => {
+exports.register_user = asyncHandler(async (req, res, next) => {
 	bcrypt.hash(req.body.password, 13, async (err, hashedPassword) => {
+		if (err) return next(err);
 		const newUser = new models.User({
 			username: req.body.username,
 			password: hashedPassword,
