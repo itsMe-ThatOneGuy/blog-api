@@ -16,10 +16,10 @@ exports.register_user = asyncHandler(async (req, res, next) => {
 });
 
 exports.get_user = asyncHandler(async (req, res) => {
-	await models.User.findById(req.params.userId);
+	const user = await models.User.findById(req.params.userId);
 	return res.status(200).json({
 		statusCode: 200,
 		message: 'SELECTED USER',
-		user: { id: user._id, username: username },
+		user: { Id: user._id, username: user.username },
 	});
 });
