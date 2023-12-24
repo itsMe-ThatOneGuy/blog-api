@@ -1,8 +1,8 @@
 const AppError = require('./AppError');
 
 class ReqTypeError extends AppError {
-	constructor(message, status) {
-		super(message || 'BAD ID ID REQUEST', status || 400);
+	constructor(message) {
+		super(message || 'BAD ID IN REQUEST', 400);
 	}
 }
 
