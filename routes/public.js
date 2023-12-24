@@ -3,7 +3,7 @@ const router = express.Router();
 const controllers = require('../controllers/index');
 const idTypeCheck = require('../middleware/idTypeCheck');
 
-router.get('/user/userId', idTypeCheck, controllers.userController.get_user);
+router.get('/user/:userId', idTypeCheck, controllers.userController.get_user);
 
 router.post('/user/test', controllers.authController.test_auth);
 
