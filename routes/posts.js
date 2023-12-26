@@ -1,52 +1,72 @@
-const express = require('express');
-const router = express.Router();
 const controllers = require('../controllers/index');
 const idTypeCheck = require('../middleware/idTypeCheck');
 
-router.get('/', controllers.postController.get_all_posts);
+const postsPublic = (router) => {
+	router.get('/posts', controllers.postController.get_all_posts);
 
-router.post('/', controllers.postController.create_post);
+	router.get(
+		'/posts/:postId',
+		idTypeCheck,
+		controllers.postController.get_single_post,
+	);
 
-router.get('/:postId', idTypeCheck, controllers.postController.get_single_post);
+	router.get(
+		'/posts/:postId/comments',
+		idTypeCheck,
+		controllers.commentController.get_post_comments,
+	);
 
-router.put(
-	'/:postId/published',
-	idTypeCheck,
-	controllers.postController.change_published,
-);
+	router.post(
+		'/posts/:postId/comments',
+		idTypeCheck,
+		controllers.commentController.create_comment,
+	);
 
-router.get(
-	'/:postId/comments',
-	idTypeCheck,
-	controllers.commentController.get_post_comments,
-);
+	router.get(
+		'/posts/:postId/comments/:commentId',
+		idTypeCheck,
+		controllers.commentController.get_single_comment,
+	);
 
-router.get(
-	'/:postId/comments/:commentId',
-	idTypeCheck,
-	controllers.commentController.get_single_comment,
-);
+	router.put(
+		'/posts/:postId/comments/:commentId',
+		idTypeCheck,
+		controllers.commentController.update_comment,
+	);
 
-router.post(
-	'/:postId/comments',
-	idTypeCheck,
-	controllers.commentController.create_comment,
-);
+	router.delete(
+		'/posts/:postId/comments/:commentId',
+		idTypeCheck,
+		controllers.commentController.delete_comment,
+	);
+	return router;
+};
 
-router.put('/:postId', idTypeCheck, controllers.postController.update_post);
+const postsPrivate = (router) => {
+	router.post('/posts', controllers.postController.create_post);
 
-router.put(
-	'/:postId/comments/:commentId',
-	idTypeCheck,
-	controllers.commentController.update_comment,
-);
+	router.put(
+		'/posts/:postId',
+		idTypeCheck,
+		controllers.postController.update_post,
+	);
 
-router.delete('/:postId', idTypeCheck, controllers.postController.delete_post);
+	router.delete(
+		'/posts/:postId',
+		idTypeCheck,
+		controllers.postController.delete_post,
+	);
 
-router.delete(
-	'/:postId/comments/:commentId',
-	idTypeCheck,
-	controllers.commentController.delete_comment,
-);
+	router.put(
+		'/posts/:postId/published',
+		idTypeCheck,
+		controllers.postController.change_published,
+	);
 
-module.exports = router;
+	return router;
+};
+
+module.exports = {
+	postsPublic,
+	postsPrivate,
+};

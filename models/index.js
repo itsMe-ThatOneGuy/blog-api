@@ -6,7 +6,7 @@ const Comment = require('./comment');
 async function connectToDatabase() {
 	try {
 		await mongoose.connect(
-			process.env.NODE_ENV !== undefined
+			process.env.NODE_ENV !== 'development'
 				? process.env.MONGODB_URI
 				: process.env.MONGODB_URI_DEV,
 		);

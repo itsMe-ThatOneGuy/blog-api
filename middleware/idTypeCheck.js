@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const errors = require('./errors/index');
 
 module.exports = function (req, res, next) {
 	const idArray = Object.values(req.params);
@@ -8,9 +9,7 @@ module.exports = function (req, res, next) {
 
 	for (id of idArray) {
 		if (!mongoose.Types.ObjectId.isValid(id)) {
-			return res
-				.status(400)
-				.json({ statusCode: 400, message: 'ID IS NOT VALID' });
+			throw new errors.ReqTypeError();
 		}
 	}
 
