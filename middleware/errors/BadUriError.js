@@ -1,9 +1,9 @@
 const AppError = require('./AppError');
 
-class BadUri extends AppError {
+class BadUriError extends AppError {
 	constructor(message) {
 		super(message || 'BAD URI', 404);
 	}
 }
 
-module.exports = BadUri;
+module.exports = BadUriError;
