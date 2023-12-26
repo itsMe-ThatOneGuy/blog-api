@@ -19,6 +19,45 @@ exports.get_all_posts = asyncHandler(async (req, res, next) => {
 	}
 });
 
+exports.create_post = asyncHandler(async (req, res, next) => {
+	try {
+		if (!req.user.isAdmin)
+			return next(new errors.PermissionError('NOT AUTHORIZED TO MAKE POSTS'));
+
+		const post = new models.Post({
+			user: req.user.sub,
+			title: req.body.title,
+			body: req.body.body,
+		});
+		await post.save();
+
+		return res
+			.status(200)
+			.json({ statusCode: 200, message: 'CREATED POST', post: post });
+	} catch (err) {
+		return next(err);
+	}
+});
+
+exports.get_single_post = asyncHandler(async (req, res, next) => {
+	try {
+		const post = await models.Post.findById(req.params.postId)
+			.populate('user', 'username')
+			.populate({
+				path: 'comments',
+				populate: { path: 'user', select: 'username' },
+			});
+		if (post === null)
+			return next(new errors.ResourceError('COULD NOT FIND POST', 404));
+
+		return res
+			.status(200)
+			.json({ statusCode: 200, message: 'SELECTED POST', post: post });
+	} catch (err) {
+		return next(err);
+	}
+});
+
 exports.update_post = asyncHandler(async (req, res, next) => {
 	try {
 		if (!req.user.isAdmin)
