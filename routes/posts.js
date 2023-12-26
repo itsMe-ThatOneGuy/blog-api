@@ -39,12 +39,11 @@ const postsPublic = (router) => {
 		idTypeCheck,
 		controllers.commentController.delete_comment,
 	);
+
 	return router;
 };
 
 const postsPrivate = (router) => {
-	router.post('/posts', controllers.postController.create_post);
-
 	router.put(
 		'/posts/:postId',
 		idTypeCheck,
