@@ -47,33 +47,35 @@ exports.refresh = asyncHandler(async (req, res) => {
 });
 
 exports.login_user = asyncHandler(async (req, res) => {
-	const user = await models.User.findOne({
-		username: req.body.username,
-	}).exec();
-	const password = await bcrypt.compare(req.body.password, user.password);
+	try {
+		const user = await models.User.findOne({
+			username: req.body.username,
+		}).exec();
+		const password = await bcrypt.compare(req.body.password, user.password);
 
-	const payload = {
-		sub: user._id,
-		username: user.username,
-		isAdmin: user.isAdmin,
-	};
+		const payload = {
+			sub: user._id,
+			username: user.username,
+			isAdmin: user.isAdmin,
+		};
 
-	if (user && password) {
-		const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
-			expiresIn: 120,
-		});
+		if (user && password) {
+			const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
+				expiresIn: 120,
+			});
 
-		const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
-			expiresIn: '1d',
-		});
+			const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
+				expiresIn: '1d',
+			});
 
-		res
-			.cookie('jwt', refreshToken, { httpOnly: true, secure: false })
-			.status(200)
-			.json({ statusCode: 200, token: accessToken, refresh: refreshToken });
-	} else {
-		res
-			.status(401)
-			.json({ statusCode: 401, message: 'Username or Password incorrect' });
+			res
+				.cookie('jwt', refreshToken, { httpOnly: true, secure: false })
+				.status(200)
+				.json({ statusCode: 200, token: accessToken, refresh: refreshToken });
+		} else {
+			return next(new errors.AuthError('INVALID USERNAME OR PASSWORD', 401));
+		}
+	} catch (err) {
+		next(err);
 	}
 });
