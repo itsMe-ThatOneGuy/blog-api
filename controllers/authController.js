@@ -39,20 +39,6 @@ exports.refresh = asyncHandler(async (req, res) => {
 	}
 });
 
-exports.register_user = asyncHandler(async (req, res, next) => {
-	bcrypt.hash(req.body.password, 13, async (err, hashedPassword) => {
-		if (err) return next(err);
-		const newUser = new models.User({
-			username: req.body.username,
-			password: hashedPassword,
-		});
-		await newUser.save();
-		res
-			.status(200)
-			.json({ statusCode: 200, message: 'User created', user: newUser });
-	});
-});
-
 exports.login_user = asyncHandler(async (req, res) => {
 	const user = await models.User.findOne({
 		username: req.body.username,
