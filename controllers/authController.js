@@ -2,6 +2,7 @@ const models = require('../models/index');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const errors = require('../middleware/errors/index');
 
 exports.test_auth = (req, res) => {
 	return res
@@ -10,32 +11,38 @@ exports.test_auth = (req, res) => {
 };
 
 exports.refresh = asyncHandler(async (req, res) => {
-	const refreshToken = req.cookies.jwt;
-	if (!refreshToken) {
-		return res
-			.status(401)
-			.json({ statusCode: 401, message: 'ACCESS DENIED, NO REFRESH TOKEN' });
-	}
-
 	try {
-		const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+		const refreshToken = req.cookies.jwt;
+		if (!refreshToken)
+			return next(new errors.AuthError('ACCESS DENIED, NO REFRESH TOKEN', 401));
+
+		const decoded = jwt.verify(
+			refreshToken,
+			process.env.JWT_REFRESH_KEY,
+			(err, decoded) => {
+				if (err)
+					return next(new errors.AuthError('INVALID REFRESH TOKEN', 400));
+				return decoded;
+			},
+		);
+
 		const payload = {
 			sub: decoded.sub,
 			username: decoded.username,
 			isAdmin: decoded.isAdmin,
 		};
+
 		const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
 			expiresIn: 120,
 		});
-		res.status(200).json({
+
+		return res.status(200).json({
 			statusCode: 200,
 			message: 'ACCESS TOKEN REFRESHED',
 			token: accessToken,
 		});
-	} catch {
-		return res
-			.status(400)
-			.json({ statusCode: 400, message: 'Invalid refresh token' });
+	} catch (err) {
+		return next(err);
 	}
 });
 
