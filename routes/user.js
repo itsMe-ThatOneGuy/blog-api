@@ -2,8 +2,6 @@ const controllers = require('../controllers/index');
 const idTypeCheck = require('../middleware/idTypeCheck');
 
 const userPublic = (router) => {
-	router.post('/user/test', controllers.authController.test_auth);
-
 	router.get('/user/:userId', idTypeCheck, controllers.userController.get_user);
 
 	router.post('/user/register', controllers.userController.register_user);
@@ -14,6 +12,8 @@ const userPublic = (router) => {
 };
 
 const userPrivate = (router) => {
+	router.post('/user/test', controllers.authController.test_auth);
+
 	return router;
 };
 
