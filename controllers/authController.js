@@ -10,7 +10,7 @@ exports.test_auth = (req, res) => {
 		.json({ statusCode: 200, message: 'AUTH WORKED', user: req.user });
 };
 
-exports.refresh = asyncHandler(async (req, res) => {
+exports.refresh = asyncHandler(async (req, res, next) => {
 	try {
 		const refreshToken = req.cookies.jwt;
 		if (!refreshToken)
@@ -46,7 +46,7 @@ exports.refresh = asyncHandler(async (req, res) => {
 	}
 });
 
-exports.login_user = asyncHandler(async (req, res) => {
+exports.login_user = asyncHandler(async (req, res, next) => {
 	try {
 		const user = await models.User.findOne({
 			username: req.body.username,
