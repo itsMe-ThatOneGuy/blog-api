@@ -12,6 +12,7 @@ var cookieExtractor = function (req) {
 const tokenOpts = {
 	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 	secretOrKey: process.env.JWT_TOKEN_KEY,
+	passReqToCallback: true,
 };
 
 const refreshOpts = {
@@ -21,8 +22,9 @@ const refreshOpts = {
 
 module.exports = function (passport) {
 	passport.use(
-		new JwtStrategy(tokenOpts, (jwt_payload, done) => {
+		new JwtStrategy(tokenOpts, (req, jwt_payload, done) => {
 			try {
+				req.user = jwt_payload;
 				return done(null, jwt_payload);
 			} catch (err) {
 				return done(err, false);
