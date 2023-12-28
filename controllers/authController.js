@@ -30,6 +30,13 @@ exports.userAuth = (req, res, next) => {
 	})(req, res, next);
 };
 
+exports.tokenAuth = (req, res, next) => {
+	passport.authenticate('refresh', function (err, user) {
+		if (err) {
+			return next(err);
+		}
+		return next();
+	})(req, res, next);
 };
 
 exports.refresh = asyncHandler(async (req, res, next) => {
