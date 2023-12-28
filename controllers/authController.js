@@ -4,10 +4,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const errors = require('../middleware/errors/index');
 
-exports.test_auth = (req, res) => {
-	return res
-		.status(200)
-		.json({ statusCode: 200, message: 'AUTH WORKED', user: req.user });
+exports.test_auth = (req, res, next) => {
+	try {
+		return res
+			.status(200)
+			.json({ statusCode: 200, message: 'AUTH WORKED', user: req.user });
+	} catch (err) {
+		return next(err);
+	}
+};
+
 };
 
 exports.refresh = asyncHandler(async (req, res, next) => {
