@@ -3,6 +3,10 @@ const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const errors = require('../middleware/errors/index');
+const initPassport = require('../helpers/passport');
+const passport = require('passport');
+
+initPassport(passport);
 
 exports.test_auth = (req, res, next) => {
 	try {
