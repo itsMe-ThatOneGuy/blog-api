@@ -12,7 +12,7 @@ const userPublic = (router) => {
 };
 
 const userPrivate = (router) => {
-	router.post('/user/test', controllers.authController.test_auth);
+	router.get('/user/test', controllers.authController.test_auth);
 
 	return router;
 };
