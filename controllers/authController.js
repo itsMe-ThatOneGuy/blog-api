@@ -18,6 +18,18 @@ exports.test_auth = (req, res, next) => {
 	}
 };
 
+exports.userAuth = (req, res, next) => {
+	passport.authenticate('jwt', { session: false }, (err, user) => {
+		if (err) {
+			return next(err);
+		}
+		if (!user) {
+			throw new errors.AuthError();
+		}
+		return next();
+	})(req, res, next);
+};
+
 };
 
 exports.refresh = asyncHandler(async (req, res, next) => {
