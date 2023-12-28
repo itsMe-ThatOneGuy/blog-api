@@ -22,25 +22,28 @@ exports.refresh = asyncHandler(async (req, res, next) => {
 			(err, decoded) => {
 				if (err)
 					return next(new errors.AuthError('INVALID REFRESH TOKEN', 400));
+
 				return decoded;
 			},
 		);
 
-		const payload = {
-			sub: decoded.sub,
-			username: decoded.username,
-			isAdmin: decoded.isAdmin,
-		};
+		if (decoded) {
+			const payload = {
+				sub: decoded.sub,
+				username: decoded.username,
+				isAdmin: decoded.isAdmin,
+			};
 
-		const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
-			expiresIn: 120,
-		});
+			const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
+				expiresIn: 120,
+			});
 
-		return res.status(200).json({
-			statusCode: 200,
-			message: 'ACCESS TOKEN REFRESHED',
-			token: accessToken,
-		});
+			return res.status(200).json({
+				statusCode: 200,
+				message: 'ACCESS TOKEN REFRESHED',
+				token: accessToken,
+			});
+		}
 	} catch (err) {
 		return next(err);
 	}
