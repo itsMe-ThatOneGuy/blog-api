@@ -111,7 +111,6 @@ exports.login_user = asyncHandler(async (req, res, next) => {
 					success: true,
 					status: 200,
 					token: accessToken,
-					refresh: refreshToken,
 				});
 		} else {
 			return next(new errors.AuthError('INVALID USERNAME OR PASSWORD', 401));
