@@ -11,9 +11,12 @@ exports.get_all_posts = asyncHandler(async (req, res, next) => {
 				populate: { path: 'user', select: 'username' },
 			});
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'ALL POSTS', posts: allPosts });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'ALL POSTS',
+			posts: allPosts,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -31,9 +34,12 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 		});
 		await post.save();
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'CREATED POST', post: post });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'CREATED POST',
+			post: post,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -50,9 +56,12 @@ exports.get_single_post = asyncHandler(async (req, res, next) => {
 		if (post === null)
 			return next(new errors.ResourceError('COULD NOT FIND POST', 404));
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'SELECTED POST', post: post });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'SELECTED POST',
+			post: post,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -78,9 +87,12 @@ exports.update_post = asyncHandler(async (req, res, next) => {
 				populate: { path: 'user', select: 'username' },
 			});
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'UPDATED POST', post: updatedPost });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'UPDATED POST',
+			post: updatedPost,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -108,9 +120,12 @@ exports.delete_post = asyncHandler(async (req, res, next) => {
 
 		await models.Post.findByIdAndDelete(req.params.postId);
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'Deleted Post', post: post });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'Deleted Post',
+			post: post,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -141,7 +156,8 @@ exports.change_published = asyncHandler(async (req, res, next) => {
 			});
 
 		return res.status(200).json({
-			statusCode: 200,
+			success: true,
+			status: 200,
 			message: 'UPDATED POST PUBLISH STATUS',
 			post: updatedPost,
 		});
