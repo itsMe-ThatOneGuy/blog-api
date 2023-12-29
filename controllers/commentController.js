@@ -11,7 +11,8 @@ exports.get_post_comments = asyncHandler(async (req, res, next) => {
 		if (post === null) return next(new errors.ResourceError('POST NOT FOUND'));
 
 		return res.status(200).json({
-			statusCode: 200,
+			success: true,
+			status: 200,
 			message: 'SELECTED POSTS COMMENTS',
 			comments: post.comments,
 		});
@@ -34,9 +35,12 @@ exports.create_comment = asyncHandler(async (req, res, next) => {
 
 		const updatedPost = await post.save();
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, comment: comment, updatedPost: updatedPost });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			comment: comment,
+			updatedPost: updatedPost,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -47,9 +51,12 @@ exports.get_single_comment = asyncHandler(async (req, res, next) => {
 	if (comment === null)
 		return next(new errors.ResourceError('COMMENT NOT FOUND'));
 
-	return res
-		.status(200)
-		.json({ statusCode: 200, message: 'GET SINGLE COMMENT', comment: comment });
+	return res.status(200).json({
+		success: true,
+		status: 200,
+		message: 'GET SINGLE COMMENT',
+		comment: comment,
+	});
 });
 
 exports.update_comment = asyncHandler(async (req, res, next) => {
@@ -68,9 +75,12 @@ exports.update_comment = asyncHandler(async (req, res, next) => {
 			{ new: true },
 		);
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'UPDATE COMMENT', comment: update });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'UPDATE COMMENT',
+			comment: update,
+		});
 	} catch (err) {
 		next(err);
 	}
@@ -100,9 +110,12 @@ exports.delete_comment = asyncHandler(async (req, res) => {
 			},
 		);
 
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'DELETE COMMENT', comment: comment });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'DELETE COMMENT',
+			comment: comment,
+		});
 	} catch (err) {
 		return next(err);
 	}
