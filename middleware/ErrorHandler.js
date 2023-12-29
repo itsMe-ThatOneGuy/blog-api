@@ -1,5 +1,5 @@
 module.exports = (err, req, res, next) => {
-	const errStatus = err.statusCode || 500;
+	const errStatus = err.status || 500;
 	const errMsg = err.message || 'SOMETHING WENT WRONG';
 	res.status(errStatus).json({
 		success: false,

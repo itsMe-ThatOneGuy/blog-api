@@ -8,7 +8,7 @@ class AppError extends Error {
 
 		this.message = message || 'SOMETIHNG WENT WRONG.';
 
-		this.statusCode = status || 500;
+		this.status = status || 500;
 	}
 }
 
