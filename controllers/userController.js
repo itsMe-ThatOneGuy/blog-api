@@ -14,9 +14,12 @@ exports.register_user = asyncHandler(async (req, res, next) => {
 			});
 			await newUser.save();
 
-			return res
-				.status(200)
-				.json({ statusCode: 200, message: 'User created', user: newUser });
+			return res.status(200).json({
+				success: true,
+				status: 200,
+				message: 'User created',
+				user: newUser,
+			});
 		});
 	} catch (err) {
 		return next(err);
@@ -29,7 +32,8 @@ exports.get_user = asyncHandler(async (req, res) => {
 		if (user === null) return next(new errors.ResourceError('USER NOT FOUND'));
 
 		return res.status(200).json({
-			statusCode: 200,
+			success: true,
+			status: 200,
 			message: 'SELECTED USER',
 			user: { Id: user._id, username: user.username },
 		});
