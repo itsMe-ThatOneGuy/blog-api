@@ -1,5 +1,6 @@
 const models = require('../models/index');
 const asyncHandler = require('express-async-handler');
+const bcrypt = require('bcryptjs');
 const errors = require('../middleware/errors/index');
 
 exports.register_user = asyncHandler(async (req, res, next) => {
