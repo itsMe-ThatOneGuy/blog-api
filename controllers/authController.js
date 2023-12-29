@@ -10,9 +10,12 @@ initPassport(passport);
 
 exports.test_auth = (req, res, next) => {
 	try {
-		return res
-			.status(200)
-			.json({ statusCode: 200, message: 'AUTH WORKED', user: req.user });
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'AUTH WORKED',
+			user: req.user,
+		});
 	} catch (err) {
 		return next(err);
 	}
@@ -68,7 +71,8 @@ exports.refresh = asyncHandler(async (req, res, next) => {
 			});
 
 			return res.status(200).json({
-				statusCode: 200,
+				success: true,
+				status: 200,
 				message: 'ACCESS TOKEN REFRESHED',
 				token: accessToken,
 			});
@@ -103,7 +107,12 @@ exports.login_user = asyncHandler(async (req, res, next) => {
 			res
 				.cookie('jwt', refreshToken, { httpOnly: true, secure: false })
 				.status(200)
-				.json({ statusCode: 200, token: accessToken, refresh: refreshToken });
+				.json({
+					success: true,
+					status: 200,
+					token: accessToken,
+					refresh: refreshToken,
+				});
 		} else {
 			return next(new errors.AuthError('INVALID USERNAME OR PASSWORD', 401));
 		}
