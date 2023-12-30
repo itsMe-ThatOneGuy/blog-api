@@ -3,6 +3,7 @@ const ResourceError = require('./ResourceError');
 const BadUriError = require('./BadUriError');
 const PermissionError = require('./PermissionError');
 const AuthError = require('./AuthError');
+const ValidationError = require('./ValidationError');
 
 module.exports = {
 	ReqTypeError,
@@ -10,4 +11,5 @@ module.exports = {
 	BadUriError,
 	PermissionError,
 	AuthError,
+	ValidationError,
 };
