@@ -2,13 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const ErrorHandler = require('./middleware/ErrorHandler');
+const compression = require('compression');
 
+const ErrorHandler = require('./middleware/ErrorHandler');
 const errors = require('./middleware/errors/index');
 const models = require('./models/index');
 const routes = require('./routes/index');
 
 const app = express();
+app.use(compression());
 
 models.connectToDatabase();
 
