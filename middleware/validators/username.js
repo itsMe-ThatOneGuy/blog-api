@@ -6,6 +6,7 @@ const usernameValidator = () => {
 			.trim()
 			.isLength({ min: 1 })
 			.withMessage('USERNAME MUST NOT BE EMPTY')
+			.bail()
 			.custom(async (value) => {
 				return User.findOne({ username: value })
 					.exec()
@@ -19,6 +20,4 @@ const usernameValidator = () => {
 	];
 };
 
-module.exports = {
-	usernameValidator,
-};
+module.exports = usernameValidator;
