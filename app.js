@@ -11,6 +11,7 @@ const models = require('./models/index');
 const routes = require('./routes/index');
 
 const app = express();
+app.disable('x-powered-by');
 app.use(helmet());
 app.use(compression());
 
