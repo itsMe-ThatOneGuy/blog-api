@@ -1,15 +1,10 @@
 const errors = require('../middleware/errors/index');
-const models = require('../models/index');
+const services = require('../services/index');
 const asyncHandler = require('express-async-handler');
 
 exports.get_all_posts = asyncHandler(async (req, res, next) => {
 	try {
-		const allPosts = await models.Post.find({})
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
-			});
+		const allPosts = await services.postServices.allPosts();
 
 		return res.status(200).json({
 			success: true,
@@ -27,12 +22,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 		if (!req.user.isAdmin)
 			return next(new errors.PermissionError('NOT AUTHORIZED TO MAKE POSTS'));
 
-		const post = new models.Post({
-			user: req.user.sub,
-			title: req.body.title,
-			body: req.body.body,
-		});
-		await post.save();
+		const post = await services.postServices.createPost(req.user, req.body);
 
 		return res.status(200).json({
 			success: true,
@@ -47,14 +37,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 
 exports.get_single_post = asyncHandler(async (req, res, next) => {
 	try {
-		const post = await models.Post.findById(req.params.postId)
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
-			});
-		if (post === null)
-			return next(new errors.ResourceError('COULD NOT FIND POST', 404));
+		const post = await services.postServices.getSinglePost(req.params);
 
 		return res.status(200).json({
 			success: true,
@@ -72,20 +55,10 @@ exports.update_post = asyncHandler(async (req, res, next) => {
 		if (!req.user.isAdmin)
 			return next(new errors.PermissionError('NOT AUTHORIZED TO UPDATE POSTS'));
 
-		const currentPost = await models.Post.findById(req.params.postId);
-		if (currentPost === null)
-			return next(new errors.ResourceError('COULD NOT FIND POST', 404));
-
-		const updatedPost = await models.Post.findByIdAndUpdate(
-			req.params.postId,
-			{ $set: { title: req.body.title, body: req.body.body } },
-			{ new: true },
-		)
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
-			});
+		const updatedPost = await services.postServices.updatePost(
+			req.params,
+			req.body,
+		);
 
 		return res.status(200).json({
 			success: true,
@@ -103,22 +76,7 @@ exports.delete_post = asyncHandler(async (req, res, next) => {
 		if (!req.user.isAdmin)
 			return next(new errors.PermissionError('NOT AUTHORIZED TO DELETE POSTS'));
 
-		const post = await models.Post.findById(req.params.postId)
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
-			});
-		if (post === null)
-			return next(new errors.ResourceError('COULD NOT FIND POST', 404));
-
-		if (post.comments.length !== 0) {
-			post.comments.forEach(async (comment) => {
-				await models.Comment.findByIdAndDelete(comment._id);
-			});
-		}
-
-		await models.Post.findByIdAndDelete(req.params.postId);
+		const post = await services.postServices.deletePost(req.params);
 
 		return res.status(200).json({
 			success: true,
@@ -140,20 +98,10 @@ exports.change_published = asyncHandler(async (req, res, next) => {
 				),
 			);
 
-		const currentPost = await models.Post.findById(req.params.postId);
-		if (currentPost === null)
-			return next(new errors.ResourceError('COULD NOT FIND POST', 404));
-
-		const updatedPost = await models.Post.findByIdAndUpdate(
-			req.params.postId,
-			{ $set: { isPublished: req.body.isPublished } },
-			{ new: true },
-		)
-			.populate('user', 'username')
-			.populate({
-				path: 'comments',
-				populate: { path: 'user', select: 'username' },
-			});
+		const updatedPost = await services.postServices.deletePost(
+			req.params,
+			req.body,
+		);
 
 		return res.status(200).json({
 			success: true,
