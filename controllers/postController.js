@@ -1,4 +1,3 @@
-const errors = require('../middleware/errors/index');
 const services = require('../services/index');
 const asyncHandler = require('express-async-handler');
 
@@ -11,6 +10,7 @@ exports.get_all_posts = asyncHandler(async (req, res, next) => {
 			status: 200,
 			message: 'ALL POSTS',
 			posts: allPosts,
+			total: allPosts.length,
 		});
 	} catch (err) {
 		return next(err);
@@ -73,7 +73,7 @@ exports.delete_post = asyncHandler(async (req, res, next) => {
 		return res.status(200).json({
 			success: true,
 			status: 200,
-			message: 'Deleted Post',
+			message: 'DELETED POST',
 			post: post,
 		});
 	} catch (err) {
@@ -92,7 +92,7 @@ exports.change_published = asyncHandler(async (req, res, next) => {
 		return res.status(200).json({
 			success: true,
 			status: 200,
-			message: 'UPDATED POST PUBLISH STATUS',
+			message: 'POST PUBLISH STATUS UPDATED',
 			post: updatedPost,
 		});
 	} catch (err) {
