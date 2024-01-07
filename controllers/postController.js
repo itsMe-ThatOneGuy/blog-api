@@ -19,9 +19,6 @@ exports.get_all_posts = asyncHandler(async (req, res, next) => {
 
 exports.create_post = asyncHandler(async (req, res, next) => {
 	try {
-		if (!req.user.isAdmin)
-			return next(new errors.PermissionError('NOT AUTHORIZED TO MAKE POSTS'));
-
 		const post = await services.postServices.createPost(req.user, req.body);
 
 		return res.status(200).json({
@@ -52,11 +49,9 @@ exports.get_single_post = asyncHandler(async (req, res, next) => {
 
 exports.update_post = asyncHandler(async (req, res, next) => {
 	try {
-		if (!req.user.isAdmin)
-			return next(new errors.PermissionError('NOT AUTHORIZED TO UPDATE POSTS'));
-
 		const updatedPost = await services.postServices.updatePost(
 			req.params,
+			req.user,
 			req.body,
 		);
 
@@ -73,10 +68,7 @@ exports.update_post = asyncHandler(async (req, res, next) => {
 
 exports.delete_post = asyncHandler(async (req, res, next) => {
 	try {
-		if (!req.user.isAdmin)
-			return next(new errors.PermissionError('NOT AUTHORIZED TO DELETE POSTS'));
-
-		const post = await services.postServices.deletePost(req.params);
+		const post = await services.postServices.deletePost(req.params, req.user);
 
 		return res.status(200).json({
 			success: true,
@@ -91,15 +83,9 @@ exports.delete_post = asyncHandler(async (req, res, next) => {
 
 exports.change_published = asyncHandler(async (req, res, next) => {
 	try {
-		if (!req.user.isAdmin)
-			return next(
-				new errors.PermissionError(
-					'NOT AUTHORIZED TO CHANGE POST PUBLISH STATUS',
-				),
-			);
-
 		const updatedPost = await services.postServices.deletePost(
 			req.params,
+			req.user,
 			req.body,
 		);
 

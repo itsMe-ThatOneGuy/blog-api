@@ -12,6 +12,9 @@ exports.allPosts = asyncHandler(async () => {
 });
 
 exports.createPost = asyncHandler(async (user, body) => {
+	if (!user.isAdmin)
+		throw new errors.PermissionError('NOT AUTHORIZED TO MAKE POSTS');
+
 	const post = new models.Post({
 		user: user.sub,
 		title: body.title,
@@ -19,7 +22,7 @@ exports.createPost = asyncHandler(async (user, body) => {
 	});
 	await post.save();
 
-	return post;
+	return post.populate('user', 'username');
 });
 
 exports.getSinglePost = asyncHandler(async (params) => {
@@ -35,7 +38,10 @@ exports.getSinglePost = asyncHandler(async (params) => {
 	return post;
 });
 
-exports.updatePost = asyncHandler(async (params, body) => {
+exports.updatePost = asyncHandler(async (params, user, body) => {
+	if (!user.isAdmin)
+		throw new errors.PermissionError('NOT AUTHORIZED TO UPDATE POSTS');
+
 	await this.getSinglePost(params);
 
 	return await models.Post.findByIdAndUpdate(
@@ -50,7 +56,10 @@ exports.updatePost = asyncHandler(async (params, body) => {
 		});
 });
 
-exports.deletePost = asyncHandler(async (params) => {
+exports.deletePost = asyncHandler(async (params, user) => {
+	if (!user.isAdmin)
+		throw new errors.PermissionError('NOT AUTHORIZED TO DELETE POSTS');
+
 	const post = await this.getSinglePost(params);
 
 	if (post.comments.length !== 0) {
@@ -64,7 +73,12 @@ exports.deletePost = asyncHandler(async (params) => {
 	return post;
 });
 
-exports.changePublished = asyncHandler(async (params, body) => {
+exports.changePublished = asyncHandler(async (params, user, body) => {
+	if (!user.isAdmin)
+		throw new errors.PermissionError(
+			'NOT AUTHORIZED TO CHANGE POST PUBLISH STATUS',
+		);
+
 	await this.getSinglePost(params);
 
 	return await models.Post.findByIdAndUpdate(
