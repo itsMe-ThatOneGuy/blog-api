@@ -1,14 +1,11 @@
 const models = require('../models/index');
+const services = require('../services/index');
 const asyncHandler = require('express-async-handler');
 const errors = require('../middleware/errors/index');
 
 exports.get_post_comments = asyncHandler(async (req, res, next) => {
 	try {
-		const post = await models.Post.findById(req.params.postId).populate({
-			path: 'comments',
-			populate: { path: 'user', select: 'username' },
-		});
-		if (post === null) return next(new errors.ResourceError('POST NOT FOUND'));
+		const post = await services.postServices.getSinglePost(req.params);
 
 		return res.status(200).json({
 			success: true,
@@ -23,17 +20,12 @@ exports.get_post_comments = asyncHandler(async (req, res, next) => {
 
 exports.create_comment = asyncHandler(async (req, res, next) => {
 	try {
-		const comment = new models.Comment({
-			user: req.user.sub,
-			body: req.body.body,
-		});
-		await comment.save();
-
-		const post = await models.Post.findById(req.params.postId);
-		if (post === null) return next(new errors.ResourceError('POST NOT FOUND'));
-		post.comments.push(comment);
-
-		const updatedPost = await post.save();
+		const { comment, updatedPost } =
+			await services.commentServices.createComment(
+				req.params,
+				req.user,
+				req.body,
+			);
 
 		return res.status(200).json({
 			success: true,
@@ -47,9 +39,7 @@ exports.create_comment = asyncHandler(async (req, res, next) => {
 });
 
 exports.get_single_comment = asyncHandler(async (req, res, next) => {
-	const comment = await models.Comment.findById(req.params.commentId);
-	if (comment === null)
-		return next(new errors.ResourceError('COMMENT NOT FOUND'));
+	const comment = await services.commentServices.getSingleComment(req.params);
 
 	return res.status(200).json({
 		success: true,
@@ -61,53 +51,28 @@ exports.get_single_comment = asyncHandler(async (req, res, next) => {
 
 exports.update_comment = asyncHandler(async (req, res, next) => {
 	try {
-		const comment = await models.Comment.findById(req.params.commentId);
-		if (comment === null)
-			return next(new errors.ResourceError('COMMENT NOT fOUND'));
-		if (comment.user.id !== req.user.sub)
-			return next(
-				new errors.PermissionError('NOT AUTHORIZED TO UPDATE COMMENT'),
-			);
-
-		const update = await models.Comment.findByIdAndUpdate(
-			req.params.commentId,
-			{ $set: { body: req.body.body } },
-			{ new: true },
+		const comment = await services.commentServices.updateComment(
+			req.params,
+			req.user,
+			req.body,
 		);
 
 		return res.status(200).json({
 			success: true,
 			status: 200,
 			message: 'UPDATE COMMENT',
-			comment: update,
+			comment: comment,
 		});
 	} catch (err) {
 		next(err);
 	}
 });
 
-exports.delete_comment = asyncHandler(async (req, res) => {
+exports.delete_comment = asyncHandler(async (req, res, next) => {
 	try {
-		const comment = await models.Comment.findById(
-			req.params.commentId,
-		).populate('user', 'id');
-		if (comment === null)
-			return next(new errors.ResourceError('COMMENT NOT FOUND'));
-
-		if (comment.user.id === req.user.sub || req.user.isAdmin)
-			return next(
-				new errors.PermissionError('NOT AUTHORIZED TO DELETE COMMENT'),
-			);
-
-		await models.Comment.findByIdAndDelete(req.params.commentId);
-
-		await models.Post.findOneAndUpdate(
-			{ _id: req.params.postId },
-			{
-				$pull: {
-					comments: req.params.commentId,
-				},
-			},
+		const comment = await services.commentServices.deleteComment(
+			req.params,
+			req.user,
 		);
 
 		return res.status(200).json({
