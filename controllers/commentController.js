@@ -1,7 +1,5 @@
-const models = require('../models/index');
 const services = require('../services/index');
 const asyncHandler = require('express-async-handler');
-const errors = require('../middleware/errors/index');
 
 exports.get_post_comments = asyncHandler(async (req, res, next) => {
 	try {
