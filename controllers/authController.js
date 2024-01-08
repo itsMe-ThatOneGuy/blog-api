@@ -21,7 +21,7 @@ exports.test_auth = (req, res, next) => {
 	}
 };
 
-exports.userAuth = (req, res, next) => {
+exports.user_Auth = (req, res, next) => {
 	passport.authenticate('jwt', { session: false }, (err, user) => {
 		if (err) {
 			return next(err);
@@ -33,7 +33,7 @@ exports.userAuth = (req, res, next) => {
 	})(req, res, next);
 };
 
-exports.tokenAuth = (req, res, next) => {
+exports.token_Auth = (req, res, next) => {
 	passport.authenticate('refresh', function (err, user) {
 		if (err) {
 			return next(err);
