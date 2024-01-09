@@ -1,35 +1,23 @@
-const models = require('../models/index');
 const asyncHandler = require('express-async-handler');
-const bcrypt = require('bcryptjs');
-const errors = require('../middleware/errors/index');
+const services = require('../services/index');
 
 exports.register_user = asyncHandler(async (req, res, next) => {
 	try {
-		bcrypt.hash(req.body.password, 13, async (err, hashedPassword) => {
-			if (err) return next(err);
+		await services.userServices.registerUser(req.body);
 
-			const newUser = new models.User({
-				username: req.body.username,
-				password: hashedPassword,
-			});
-			await newUser.save();
-
-			return res.status(200).json({
-				success: true,
-				status: 200,
-				message: 'User created',
-				user: newUser,
-			});
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'User created',
 		});
 	} catch (err) {
 		return next(err);
 	}
 });
 
-exports.get_user = asyncHandler(async (req, res) => {
+exports.get_user = asyncHandler(async (req, res, next) => {
 	try {
-		const user = await models.User.findById(req.params.userId);
-		if (user === null) return next(new errors.ResourceError('USER NOT FOUND'));
+		const user = await services.userServices.getUser(req.params);
 
 		return res.status(200).json({
 			success: true,
