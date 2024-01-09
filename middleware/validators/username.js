@@ -1,4 +1,5 @@
 const { body } = require('express-validator');
+const models = require('../../models/index');
 
 const usernameValidator = () => {
 	return [
@@ -8,7 +9,7 @@ const usernameValidator = () => {
 			.withMessage('USERNAME MUST NOT BE EMPTY')
 			.bail()
 			.custom(async (value) => {
-				return User.findOne({ username: value })
+				return models.User.findOne({ username: value })
 					.exec()
 					.then((name) => {
 						if (name !== null) {
