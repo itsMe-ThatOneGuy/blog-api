@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./user');
-const Post = require('./post');
+const PostModel = require('./post');
 const Comment = require('./comment');
 
 mongoose.set('bufferCommands', false);
@@ -25,6 +25,6 @@ mongoose.connection.on('error', () => {
 module.exports = {
 	connectToDatabase,
 	User,
-	Post,
+	PostModel,
 	Comment,
 };
