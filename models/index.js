@@ -3,6 +3,8 @@ const User = require('./user');
 const Post = require('./post');
 const Comment = require('./comment');
 
+mongoose.set('bufferCommands', false);
+
 async function connectToDatabase() {
 	try {
 		await mongoose.connect(
@@ -12,9 +14,13 @@ async function connectToDatabase() {
 		);
 		console.log('Successfully connected to database');
 	} catch (err) {
-		console.error(err);
+		throw new Error();
 	}
 }
+
+mongoose.connection.on('error', () => {
+	throw new Error();
+});
 
 module.exports = {
 	connectToDatabase,
