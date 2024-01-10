@@ -28,8 +28,9 @@ exports.create_comment = asyncHandler(async (req, res, next) => {
 		return res.status(200).json({
 			success: true,
 			status: 200,
+			message: 'CREATED COMMENT',
 			comment: comment,
-			updatedPost: updatedPost,
+			post: updatedPost,
 		});
 	} catch (err) {
 		return next(err);
