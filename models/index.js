@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('./user');
+const UserModel = require('./user');
 const PostModel = require('./post');
 const Comment = require('./comment');
 
@@ -24,7 +24,7 @@ mongoose.connection.on('error', () => {
 
 module.exports = {
 	connectToDatabase,
-	User,
+	UserModel,
 	PostModel,
 	Comment,
 };
