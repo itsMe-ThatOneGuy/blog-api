@@ -38,9 +38,9 @@ const postsPrivate = (router) => {
 	router.put(
 		'/posts/:postId',
 		idTypeCheck,
-		validator.titleValidator(),
-		validator.bodyValidator(),
-		validator.validate,
+		/* validator.titleValidator(),
+        validator.bodyValidator(),
+        validator.validate, */
 		controllers.postController.update_post,
 	);
 
