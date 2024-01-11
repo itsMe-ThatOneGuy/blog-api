@@ -68,21 +68,16 @@ const updatePost = asyncHandler(async (params, user, body) => {
 		});
 });
 
-const deletePost = asyncHandler(async (params, user) => {
+const deletePost = asyncHandler(async (params, user, comments) => {
 	if (!user.isAdmin)
 		throw new errors.PermissionError('NOT AUTHORIZED TO DELETE POSTS');
 
-	const post = await getSinglePost(params);
-
-	if (post.comments.length !== 0) {
-		post.comments.forEach(async (comment) => {
-			await CommentModel.findByIdAndDelete(comment._id);
+	return await Post.findByIdAndDelete(params.postId)
+		.populate('user', 'username')
+		.populate({
+			path: 'comments',
+			populate: { path: 'user', select: 'username' },
 		});
-	}
-
-	await Post.findByIdAndDelete(params.postId);
-
-	return post;
 });
 
 const changePublished = async (params, user, body) => {
