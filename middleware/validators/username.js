@@ -9,7 +9,7 @@ const usernameValidator = () => {
 			.withMessage('USERNAME MUST NOT BE EMPTY')
 			.bail()
 			.custom(async (value) => {
-				return models.User.findOne({ username: value })
+				return await models.UserModel.User.findOne({ username: value })
 					.exec()
 					.then((name) => {
 						if (name !== null) {
