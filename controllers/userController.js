@@ -3,12 +3,13 @@ const services = require('../services/index');
 
 exports.register_user = asyncHandler(async (req, res, next) => {
 	try {
-		await services.userServices.registerUser(req.body);
+		const user = await services.userServices.registerUser(req.body);
 
 		return res.status(200).json({
 			success: true,
 			status: 200,
 			message: 'User created',
+			user: user,
 		});
 	} catch (err) {
 		return next(err);
