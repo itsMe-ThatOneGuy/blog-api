@@ -18,7 +18,11 @@ exports.updatePost = asyncHandler(async (params, user, body) => {
 });
 
 exports.deletePost = asyncHandler(async (params, user) => {
-	return await models.PostModel.deletePost(params, user);
+	const post = await models.PostModel.getSinglePost(params);
+	const deletedPost = await models.PostModel.deletePost(params, user);
+	await models.CommentModel.deleteAllPostComments(post);
+
+	return deletedPost;
 });
 
 exports.changePublished = asyncHandler(async (params, user, body) => {
