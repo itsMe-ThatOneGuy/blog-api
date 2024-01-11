@@ -73,7 +73,7 @@ exports.update_comment = asyncHandler(async (req, res, next) => {
 
 exports.delete_comment = asyncHandler(async (req, res, next) => {
 	try {
-		const comment = await services.commentServices.deleteComment(
+		const { comment, post } = await services.commentServices.deleteComment(
 			req.params,
 			req.user,
 		);
@@ -83,6 +83,7 @@ exports.delete_comment = asyncHandler(async (req, res, next) => {
 			status: 200,
 			message: 'DELETE COMMENT',
 			comment: comment,
+			post: post,
 		});
 	} catch (err) {
 		return next(err);
