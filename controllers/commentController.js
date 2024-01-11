@@ -38,14 +38,18 @@ exports.create_comment = asyncHandler(async (req, res, next) => {
 });
 
 exports.get_single_comment = asyncHandler(async (req, res, next) => {
-	const comment = await services.commentServices.getSingleComment(req.params);
+	try {
+		const comment = await services.commentServices.getSingleComment(req.params);
 
-	return res.status(200).json({
-		success: true,
-		status: 200,
-		message: 'GET SINGLE COMMENT',
-		comment: comment,
-	});
+		return res.status(200).json({
+			success: true,
+			status: 200,
+			message: 'GET SINGLE COMMENT',
+			comment: comment,
+		});
+	} catch (err) {
+		next(err);
+	}
 });
 
 exports.update_comment = asyncHandler(async (req, res, next) => {
