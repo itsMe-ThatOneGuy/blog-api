@@ -97,12 +97,12 @@ const changePublished = async (admin, id, status) => {
 		});
 };
 
-const updatePostComments = asyncHandler(async (params) => {
+const updatePostComments = asyncHandler(async (postId, commentId) => {
 	return await Post.findOneAndUpdate(
-		{ _id: params.postId },
+		{ _id: postId },
 		{
 			$pull: {
-				comments: params.commentId,
+				comments: commentId,
 			},
 		},
 	)
