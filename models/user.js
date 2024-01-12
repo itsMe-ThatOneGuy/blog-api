@@ -12,23 +12,21 @@ const UserSchema = new Schema({
 
 const User = mongoose.model('User', UserSchema);
 
-const registerUser = asyncHandler(async (body) => {
-	bcrypt.hash(body.password, 13, async (err, hashedPassword) => {
+const registerUser = asyncHandler(async (username, password) => {
+	bcrypt.hash(password, 13, async (err, hashedPassword) => {
 		if (err) throw new errors.PermissionError();
 
 		const newUser = new User({
-			username: body.username,
+			username: username,
 			password: hashedPassword,
 		});
 
 		await newUser.save();
 	});
-
-	return body.username;
 });
 
-const getUser = asyncHandler(async (params) => {
-	const user = await User.findById(params.userId);
+const getUser = asyncHandler(async (id) => {
+	const user = await User.findById(id);
 	if (user === null) throw new errors.ResourceError('USER NOT FOUND');
 
 	return user;
