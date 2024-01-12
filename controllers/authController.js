@@ -23,8 +23,10 @@ exports.token_Auth = (req, res, next) => {
 };
 
 exports.refresh = asyncHandler(async (req, res, next) => {
+	const { jwt } = req.cookies;
+
 	try {
-		const accessToken = await services.authServices.refresh(req.cookies);
+		const accessToken = await services.authServices.refresh(jwt);
 
 		return res.status(200).json({
 			success: true,
@@ -38,9 +40,12 @@ exports.refresh = asyncHandler(async (req, res, next) => {
 });
 
 exports.login_user = asyncHandler(async (req, res, next) => {
+	const { username, password } = req.body;
+
 	try {
 		const { accessToken, refreshToken } = await services.authServices.loginUser(
-			req.body,
+			username,
+			password,
 		);
 
 		return res
