@@ -18,8 +18,11 @@ exports.get_all_posts = asyncHandler(async (req, res, next) => {
 });
 
 exports.create_post = asyncHandler(async (req, res, next) => {
+	const { sub } = req.user;
+	const { title, body } = req.body;
+
 	try {
-		const post = await services.postServices.createPost(req.user, req.body);
+		const post = await services.postServices.createPost(sub, title, body);
 
 		return res.status(200).json({
 			success: true,
@@ -33,8 +36,10 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.get_single_post = asyncHandler(async (req, res, next) => {
+	const { postId } = req.params;
+
 	try {
-		const post = await services.postServices.getSinglePost(req.params);
+		const post = await services.postServices.getSinglePost(postId);
 
 		return res.status(200).json({
 			success: true,
@@ -48,11 +53,16 @@ exports.get_single_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.update_post = asyncHandler(async (req, res, next) => {
+	const { isAdmin } = req.user;
+	const { postId } = req.params;
+	const { title, body } = req.body;
+
 	try {
 		const updatedPost = await services.postServices.updatePost(
-			req.params,
-			req.user,
-			req.body,
+			isAdmin,
+			postId,
+			title,
+			body,
 		);
 
 		return res.status(200).json({
@@ -67,8 +77,11 @@ exports.update_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.delete_post = asyncHandler(async (req, res, next) => {
+	const { isAdmin } = req.user;
+	const { postId } = req.params;
+
 	try {
-		const post = await services.postServices.deletePost(req.params, req.user);
+		const post = await services.postServices.deletePost(postId, isAdmin);
 
 		return res.status(200).json({
 			success: true,
@@ -82,11 +95,15 @@ exports.delete_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.change_published = asyncHandler(async (req, res, next) => {
+	const { postId } = req.params;
+	const { isAdmin } = req.user;
+	const { isPublished } = req.body;
+
 	try {
 		const updatedPost = await services.postServices.deletePost(
-			req.params,
-			req.user,
-			req.body,
+			isAdmin,
+			postId,
+			isPublished,
 		);
 
 		return res.status(200).json({
