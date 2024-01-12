@@ -23,22 +23,19 @@ const allPosts = asyncHandler(async () => {
 		});
 });
 
-const createPosts = asyncHandler(async (user, body) => {
-	if (!user.isAdmin)
-		throw new errors.PermissionError('NOT AUTHORIZED TO MAKE POSTS');
-
+const createPosts = asyncHandler(async (sub, title, body) => {
 	const post = new Post({
-		user: user.sub,
-		title: body.title,
-		body: body.body,
+		user: sub,
+		title: title,
+		body: body,
 	});
 	await post.save();
 
 	return post.populate('user', 'username');
 });
 
-const getSinglePost = asyncHandler(async (params) => {
-	const post = await Post.findById(params.postId)
+const getSinglePost = asyncHandler(async (id) => {
+	const post = await Post.findById(id)
 		.populate('user', 'username')
 		.populate({
 			path: 'comments',
@@ -50,15 +47,15 @@ const getSinglePost = asyncHandler(async (params) => {
 	return post;
 });
 
-const updatePost = asyncHandler(async (params, user, body) => {
-	if (!user.isAdmin)
+const updatePost = asyncHandler(async (admin, id, title, body) => {
+	if (!admin)
 		throw new errors.PermissionError('NOT AUTHORIZED TO UPDATE POSTS');
 
-	await getSinglePost(params);
+	await getSinglePost(id);
 
 	return await Post.findByIdAndUpdate(
-		params.postId,
-		{ $set: { title: body.title, body: body.body } },
+		id,
+		{ $set: { title: title, body: body } },
 		{ new: true },
 	)
 		.populate('user', 'username')
@@ -68,11 +65,11 @@ const updatePost = asyncHandler(async (params, user, body) => {
 		});
 });
 
-const deletePost = asyncHandler(async (params, user, comments) => {
-	if (!user.isAdmin)
+const deletePost = asyncHandler(async (admin, id) => {
+	if (!admin)
 		throw new errors.PermissionError('NOT AUTHORIZED TO DELETE POSTS');
 
-	return await Post.findByIdAndDelete(params.postId)
+	return await Post.findByIdAndDelete(id)
 		.populate('user', 'username')
 		.populate({
 			path: 'comments',
@@ -80,17 +77,17 @@ const deletePost = asyncHandler(async (params, user, comments) => {
 		});
 });
 
-const changePublished = async (params, user, body) => {
-	if (!user.isAdmin)
+const changePublished = async (admin, id, status) => {
+	if (!admin)
 		throw new errors.PermissionError(
 			'NOT AUTHORIZED TO CHANGE POST PUBLISH STATUS',
 		);
 
-	await getSinglePost(params);
+	await getSinglePost(id);
 
 	return await Post.findByIdAndUpdate(
-		params.postId,
-		{ $set: { isPublished: body.isPublished } },
+		id,
+		{ $set: { isPublished: status } },
 		{ new: true },
 	)
 		.populate('user', 'username')
