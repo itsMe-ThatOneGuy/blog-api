@@ -11,10 +11,10 @@ const CommentSchema = new Schema({
 
 const Comment = mongoose.model('Comment', CommentSchema);
 
-const createComment = asyncHandler(async (user, body, post) => {
+const createComment = asyncHandler(async (sub, body, post) => {
 	const comment = new Comment({
-		user: user.sub,
-		body: body.body,
+		user: sub,
+		body: body,
 	});
 	await comment.save();
 
@@ -24,36 +24,33 @@ const createComment = asyncHandler(async (user, body, post) => {
 	return { comment, updatedPost };
 });
 
-const getSingleComment = asyncHandler(async (params) => {
-	const comment = await Comment.findById(params.commentId).populate(
-		'user',
-		'username',
-	);
+const getSingleComment = asyncHandler(async (id) => {
+	const comment = await Comment.findById(id).populate('user', 'username');
 	if (comment === null) throw new errors.ResourceError('COMMENT NOT FOUND');
 
 	return comment;
 });
 
-const updateComment = asyncHandler(async (params, user, body) => {
-	const comment = await getSingleComment(params);
+const updateComment = asyncHandler(async (id, sub, body) => {
+	const comment = await getSingleComment(id);
 
-	if (comment.user.id !== user.sub)
+	if (comment.user.id !== sub)
 		throw new errors.PermissionError('NOT AUTHORIZED TO UPDATE COMMENT');
 
 	return await Comment.findByIdAndUpdate(
-		params.commentId,
-		{ $set: { body: body.body } },
+		id,
+		{ $set: { body: body } },
 		{ new: true },
 	).populate('user', 'username');
 });
 
-const deleteComment = asyncHandler(async (params, user) => {
-	const comment = await getSingleComment(params);
+const deleteComment = asyncHandler(async (id, sub, admin) => {
+	const comment = await getSingleComment(id);
 
-	if (comment.user.id !== user.sub || !user.isAdmin)
+	if (comment.user.id !== sub || !admin)
 		throw new errors.PermissionError('NOT AUTHORIZED TO DELETE COMMENT');
 
-	await Comment.findByIdAndDelete(params.commentId);
+	await Comment.findByIdAndDelete(id);
 
 	return comment;
 });
