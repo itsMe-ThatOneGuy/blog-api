@@ -29,11 +29,12 @@ exports.tokenAuth = (req, res, next) => {
 	})(req, res, next);
 };
 
-exports.loginUser = asyncHandler(async (body) => {
-	const user = await models.User.findOne({
-		username: body.username,
+exports.loginUser = asyncHandler(async (username, password) => {
+	const user = await models.UserModel.User.findOne({
+		username: username,
 	}).exec();
-	const password = await bcrypt.compare(body.password, user.password);
+
+	const matched = await bcrypt.compare(password, user.password);
 
 	const payload = {
 		sub: user._id,
@@ -41,7 +42,7 @@ exports.loginUser = asyncHandler(async (body) => {
 		isAdmin: user.isAdmin,
 	};
 
-	if (user && password) {
+	if (user && matched) {
 		const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
 			expiresIn: 120,
 		});
@@ -56,8 +57,8 @@ exports.loginUser = asyncHandler(async (body) => {
 	}
 });
 
-exports.refresh = asyncHandler(async (cookies) => {
-	const refreshToken = cookies.jwt;
+exports.refresh = asyncHandler(async (cookie) => {
+	const refreshToken = cookie.jwt;
 	if (!refreshToken)
 		throw new errors.AuthError('ACCESS DENIED, NO REFRESH TOKEN', 401);
 
