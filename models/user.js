@@ -25,8 +25,15 @@ const registerUser = asyncHandler(async (username, password) => {
 	});
 });
 
-const getUser = asyncHandler(async (id) => {
+const getUserById = asyncHandler(async (id) => {
 	const user = await User.findById(id);
+	if (user === null) throw new errors.ResourceError('USER NOT FOUND');
+
+	return user;
+});
+
+const getUserByName = asyncHandler(async (username) => {
+	const user = await User.findOne({ username: username });
 	if (user === null) throw new errors.ResourceError('USER NOT FOUND');
 
 	return user;
@@ -35,5 +42,6 @@ const getUser = asyncHandler(async (id) => {
 module.exports = {
 	User,
 	registerUser,
-	getUser,
+	getUserById,
+	getUserByName,
 };
