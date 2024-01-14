@@ -32,7 +32,7 @@ exports.tokenAuth = (req, res, next) => {
 exports.loginUser = asyncHandler(async (username, password) => {
 	const user = await models.UserModel.getUserByName(username);
 
-	const matched = await bcrypt.compare(password, user.password);
+	const _password = await bcrypt.compare(password, user.password);
 
 	const payload = {
 		sub: user._id,
@@ -40,7 +40,7 @@ exports.loginUser = asyncHandler(async (username, password) => {
 		isAdmin: user.isAdmin,
 	};
 
-	if (user && matched) {
+	if (user && _password) {
 		const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_KEY, {
 			expiresIn: 120,
 		});
