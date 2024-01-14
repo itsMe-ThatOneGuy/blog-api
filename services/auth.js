@@ -56,7 +56,7 @@ exports.loginUser = asyncHandler(async (username, password) => {
 });
 
 exports.refresh = asyncHandler(async (cookie) => {
-	const refreshToken = cookie.jwt;
+	const refreshToken = cookie;
 	if (!refreshToken)
 		throw new errors.AuthError('ACCESS DENIED, NO REFRESH TOKEN', 401);
 
