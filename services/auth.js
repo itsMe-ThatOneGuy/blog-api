@@ -30,9 +30,7 @@ exports.tokenAuth = (req, res, next) => {
 };
 
 exports.loginUser = asyncHandler(async (username, password) => {
-	const user = await models.UserModel.User.findOne({
-		username: username,
-	}).exec();
+	const user = await models.UserModel.getUserByName(username);
 
 	const matched = await bcrypt.compare(password, user.password);
 
