@@ -13,16 +13,15 @@ const UserSchema = new Schema({
 const User = mongoose.model('User', UserSchema);
 
 const registerUser = asyncHandler(async (username, password) => {
-	bcrypt.hash(password, 13, async (err, hashedPassword) => {
-		if (err) throw new errors.PermissionError();
+	const salt = await bcrypt.genSalt(13);
+	const hashedPassword = await bcrypt.hash(password, salt);
 
-		const newUser = new User({
-			username: username,
-			password: hashedPassword,
-		});
-
-		await newUser.save();
+	const newUser = new User({
+		username: username,
+		password: hashedPassword,
 	});
+
+	return await newUser.save();
 });
 
 const getUserById = asyncHandler(async (id) => {
