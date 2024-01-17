@@ -19,7 +19,7 @@ describe('Tests for the Comment datalayer', () => {
 
 	let comment;
 
-	test('createComment creates a new comment and adds it to a post', async () => {
+	test('createComment creates a new comment', async () => {
 		comment = await CommentModel.createComment(user.id, 'test Comment body');
 		expect(comment && typeof comment === 'object').toBe(true);
 		expect(comment).toHaveProperty('user');
