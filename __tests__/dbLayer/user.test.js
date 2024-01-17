@@ -30,7 +30,7 @@ describe('Tests for the User datalayer', () => {
 
 	test('getUserById returns the user obj from the DB using the user ID', async () => {
 		const _user = await userModel.getUserById(user.id);
-		expect(_user && typeof user === 'object').toBe(true);
+		expect(_user && typeof _user === 'object').toBe(true);
 		expect(_user).toHaveProperty('username', 'testUser');
 		expect(_user).toHaveProperty('password');
 		expect(_user).toHaveProperty('isAdmin', false);
@@ -44,7 +44,7 @@ describe('Tests for the User datalayer', () => {
 
 	test('getUserByName returns the user obj from DB using the username', async () => {
 		const _user = await userModel.getUserByName('testUser');
-		expect(_user && typeof user === 'object').toBe(true);
+		expect(_user && typeof _user === 'object').toBe(true);
 		expect(_user).toHaveProperty('username', 'testUser');
 		expect(_user).toHaveProperty('password');
 		expect(_user).toHaveProperty('isAdmin', false);
