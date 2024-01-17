@@ -87,6 +87,9 @@ describe('Tests for the Comment datalayer', () => {
 		expect(_comment).toHaveProperty('user');
 		expect(_comment).toHaveProperty('body', 'updated');
 		expect(_comment).toHaveProperty('commentDate');
+		await expect(async () => {
+			await CommentModel.getSingleComment(comment.id);
+		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 
 	test('deleteComment throws error if id is not provided', async () => {
