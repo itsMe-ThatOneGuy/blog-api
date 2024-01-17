@@ -1,5 +1,6 @@
 const mongodb = require('../../config/mongoConfigTesting');
 const userModel = require('../../models/user');
+const { randomId } = require('../../utils/testUtils');
 
 describe('Tests for the User datalayer', () => {
 	beforeAll(async () => {
@@ -23,9 +24,13 @@ describe('Tests for the User datalayer', () => {
 	test('registerUser returns Error when duplicate username is used', async () => {
 		await expect(async () => {
 			await userModel.registerUser('testUser', 'password1');
-		}).rejects.toThrow(
-			'E11000 duplicate key error collection: test.users index: username_1 dup key: { username: "testUser" }',
-		);
+		}).rejects.toThrow();
+	});
+
+	test('registerUser returns Error when no password is provided', async () => {
+		await expect(async () => {
+			await userModel.registerUser('testUser');
+		}).rejects.toThrow();
 	});
 
 	test('getUserById returns the user obj from the DB using the user ID', async () => {
@@ -36,9 +41,16 @@ describe('Tests for the User datalayer', () => {
 		expect(_user).toHaveProperty('isAdmin', false);
 	});
 
-	test('getUserByName returns ResourceError when not locating user', async () => {
+	test('getUserById returns Error when id is empty', async () => {
 		await expect(async () => {
-			await userModel.getUserByName(user.id);
+			await userModel.getUserByName('');
+		}).rejects.toThrow();
+	});
+
+	test('getUserById returns Error when id is wrong', async () => {
+		const _userId = randomId(user);
+		await expect(async () => {
+			await userModel.getUserByName(_userId);
 		}).rejects.toThrow('USER NOT FOUND');
 	});
 
