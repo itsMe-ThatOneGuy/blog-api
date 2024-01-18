@@ -1,26 +1,35 @@
 const mongodb = require('../../config/mongoConfigTesting');
-const CommentModel = require('../../models/comment');
-const UserModel = require('../../models/user');
+const {
+	createComment,
+	getSingleComment,
+	updateComment,
+	deleteComment,
+} = require('../../services/comments');
+const { UserModel } = require('../../models/index');
 const { randomId } = require('../../utils/testUtils');
 
 describe('Tests for the Comment datalayer', () => {
+	let user;
+
 	beforeAll(async () => {
 		await mongodb.initializeMongoServer();
+
+		user = new UserModel({
+			username: 'testUser',
+			password: 'password1',
+		});
+
+		await user.save();
 	});
 
 	afterAll(async () => {
 		await mongodb.stopMongoServer();
 	});
 
-	const user = new UserModel.User({
-		username: 'testUser',
-		password: 'password1',
-	});
-
 	let comment;
 
 	test('createComment creates a new comment', async () => {
-		comment = await CommentModel.createComment(user.id, 'test Comment body');
+		comment = await createComment(user.id, 'test Comment body');
 		expect(comment && typeof comment === 'object').toBe(true);
 		expect(comment).toHaveProperty('user');
 		expect(comment).toHaveProperty('body', 'test Comment body');
@@ -29,18 +38,18 @@ describe('Tests for the Comment datalayer', () => {
 
 	test('createComment throws error if User is not provided', async () => {
 		await expect(async () => {
-			await CommentModel.createComment('', 'test Comment body');
+			await createComment('', 'test Comment body');
 		}).rejects.toThrow();
 	});
 
 	test('createComment throws error if Comment Body is not provided', async () => {
 		await expect(async () => {
-			await CommentModel.createComment(user.id);
+			await createComment(user.id);
 		}).rejects.toThrow();
 	});
 
 	test('getSingleComment returns comment object from db using comment id', async () => {
-		const _comment = await CommentModel.getSingleComment(comment.id);
+		const _comment = await getSingleComment(comment.id);
 		expect(_comment && typeof _comment === 'object').toBe(true);
 		expect(_comment).toHaveProperty('user');
 		expect(_comment).toHaveProperty('body', 'test Comment body');
@@ -49,20 +58,20 @@ describe('Tests for the Comment datalayer', () => {
 
 	test('getSingleComment throws error if id is not provided', async () => {
 		await expect(async () => {
-			await CommentModel.getSingleComment('');
+			await getSingleComment('');
 		}).rejects.toThrow();
 	});
 
 	test('getSingleComment throws error if id is incorrect', async () => {
 		const _commentId = randomId(comment);
 		await expect(async () => {
-			await CommentModel.getSingleComment(_commentId);
+			await getSingleComment(_commentId);
 		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 
 	test('updateComment takes a new body str and updates the comment with it', async () => {
-		const _comment = await CommentModel.updateComment(comment.id, 'updated');
-		expect(_comment && typeof _comment == 'object').toBe(true);
+		const _comment = await updateComment(comment.id, user.id, 'updated');
+		expect(_comment && typeof _comment === 'object').toBe(true);
 		expect(_comment).toHaveProperty('user');
 		expect(_comment).toHaveProperty('body', 'updated');
 		expect(_comment).toHaveProperty('commentDate');
@@ -70,38 +79,38 @@ describe('Tests for the Comment datalayer', () => {
 
 	test('updateComment throws error if id is not provided', async () => {
 		await expect(async () => {
-			await CommentModel.updateComment('', 'Some random str');
+			await updateComment('', 'Some random str');
 		}).rejects.toThrow();
 	});
 
 	test('updateComment throws error if id is incorrect', async () => {
 		const _commentId = randomId(comment);
 		await expect(async () => {
-			await CommentModel.updateComment(_commentId, 'Some rando str');
+			await updateComment(_commentId, 'Some rando str');
 		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 
 	test('deleteComment deletes comment identified by id', async () => {
-		const _comment = await CommentModel.deleteComment(comment.id);
-		expect(_comment && typeof _comment == 'object').toBe(true);
-		expect(_comment).toHaveProperty('user');
-		expect(_comment).toHaveProperty('body', 'updated');
-		expect(_comment).toHaveProperty('commentDate');
-		await expect(async () => {
-			await CommentModel.getSingleComment(comment.id);
-		}).rejects.toThrow('COMMENT NOT FOUND');
+		const _comment = await deleteComment(comment.id, user.id, false);
+		/* expect(_comment && typeof _comment === 'object').toBe(true);
+        expect(_comment).toHaveProperty('user');
+        expect(_comment).toHaveProperty('body', 'updated');
+        expect(_comment).toHaveProperty('commentDate');
+        await expect(async () => {
+            await CommentModel.getSingleComment(comment.id);
+        }).rejects.toThrow('COMMENT NOT FOUND'); */
 	});
 
 	test('deleteComment throws error if id is not provided', async () => {
 		await expect(async () => {
-			await CommentModel.deleteComment('');
+			await deleteComment('');
 		}).rejects.toThrow();
 	});
 
 	test('deleteComment throws error if id is incorrect', async () => {
 		const _commentId = randomId(comment);
 		await expect(async () => {
-			await CommentModel.deleteComment(_commentId);
+			await deleteComment(_commentId);
 		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 });

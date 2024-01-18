@@ -1,7 +1,13 @@
 const mongodb = require('../../config/mongoConfigTesting');
-const PostModel = require('../../models/post');
-const UserModel = require('../../models/user');
-const CommentModel = require('../../models/comment');
+const {
+	allPosts,
+	createPosts,
+	getSinglePost,
+	updatePost,
+	deletePost,
+	changePublished,
+} = require('../../services/posts');
+const { UserModel, CommentModel } = require('../../models/index');
 const { randomId } = require('../../utils/testUtils');
 
 describe('Tests for Post datalayer', () => {
@@ -13,7 +19,7 @@ describe('Tests for Post datalayer', () => {
 		await mongodb.stopMongoServer();
 	});
 
-	const user = new UserModel.User({
+	const user = new UserModel({
 		username: 'testUser',
 		password: 'password1',
 	});
@@ -21,11 +27,7 @@ describe('Tests for Post datalayer', () => {
 	let post;
 
 	test('createPost creates a new post', async () => {
-		post = await PostModel.createPosts(
-			user.id,
-			'POST TITLE',
-			'This is the post body',
-		);
+		post = await createPosts(user.id, 'POST TITLE', 'This is the post body');
 		expect(post && typeof post === 'object').toBe(true);
 		expect(post).toHaveProperty('user');
 		expect(post).toHaveProperty('title', 'POST TITLE');
@@ -36,7 +38,7 @@ describe('Tests for Post datalayer', () => {
 	});
 
 	test('allPosts returns array of all the post objects', async () => {
-		const _posts = await PostModel.allPosts();
+		const _posts = await allPosts();
 		expect(_posts && typeof _posts === 'object').toBe(true);
 		expect(_posts[0]).toHaveProperty('user');
 		expect(_posts[0]).toHaveProperty('title', 'POST TITLE');
@@ -47,7 +49,7 @@ describe('Tests for Post datalayer', () => {
 	});
 
 	test('getSinglePost returns post identified by post ID', async () => {
-		const _post = await PostModel.getSinglePost(post.id);
+		const _post = await getSinglePost(post.id);
 		expect(_post && typeof post === 'object').toBe(true);
 		expect(_post).toHaveProperty('user');
 		expect(_post).toHaveProperty('title', 'POST TITLE');
@@ -60,7 +62,7 @@ describe('Tests for Post datalayer', () => {
 	test('getSinglePost throws error when post id is not vaild', async () => {
 		const postId = randomId(post);
 		await expect(async () => {
-			await PostModel.getSinglePost(postId);
+			await getSinglePost(postId);
 		}).rejects.toThrow('POST NOT FOUND');
 	});
 
@@ -70,7 +72,7 @@ describe('Tests for Post datalayer', () => {
 	//WRITE ERRORS
 
 	test('changePublished', async () => {
-		const _post = await PostModel.changePublished(post.id, true);
+		const _post = await changePublished(post.id, true);
 		expect(_post && typeof post === 'object').toBe(true);
 		expect(_post).toHaveProperty('user');
 		expect(_post).toHaveProperty('title', 'POST TITLE');
@@ -83,18 +85,18 @@ describe('Tests for Post datalayer', () => {
 	test('changePublished throws error when post id is not vaild', async () => {
 		const postId = randomId(post);
 		await expect(async () => {
-			await PostModel.changePublished(postId);
+			await changePublished(postId);
 		}).rejects.toThrow('POST NOT FOUND');
 	});
 
 	test('changePublished throws error when status is not vaild bool', async () => {
 		await expect(async () => {
-			await PostModel.changePublished(post.id, 'Str');
+			await changePublished(post.id, 'Str');
 		}).rejects.toThrow();
 	});
 
 	test('deletePost deletes and then returns the deleted post object', async () => {
-		const _post = await PostModel.deletePost(post.id);
+		const _post = await deletePost(post.id);
 		expect(_post && typeof post === 'object').toBe(true);
 		expect(_post).toHaveProperty('user');
 		expect(_post).toHaveProperty('title', 'POST TITLE');
@@ -103,14 +105,14 @@ describe('Tests for Post datalayer', () => {
 		expect(_post).toHaveProperty('isPublished', true);
 		expect(_post).toHaveProperty('postDate');
 		await expect(async () => {
-			await PostModel.getSinglePost(post.id);
+			await getSinglePost(post.id);
 		}).rejects.toThrow('POST NOT FOUND');
 	});
 
 	test('deletePost throws error when post id is not vaild', async () => {
 		const postId = randomId(post);
 		await expect(async () => {
-			await PostModel.deletePost(postId);
+			await deletePost(postId);
 		}).rejects.toThrow('POST NOT FOUND');
 	});
 });

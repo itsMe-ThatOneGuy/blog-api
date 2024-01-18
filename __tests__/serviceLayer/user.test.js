@@ -1,5 +1,9 @@
 const mongodb = require('../../config/mongoConfigTesting');
-const userModel = require('../../models/user');
+const {
+	registerUser,
+	getUserById,
+	getUserByName,
+} = require('../../services/user');
 const { randomId } = require('../../utils/testUtils');
 
 describe('Tests for the User datalayer', () => {
@@ -14,7 +18,7 @@ describe('Tests for the User datalayer', () => {
 	let user;
 
 	test('registerUser should add a new user to DB', async () => {
-		user = await userModel.registerUser('testUser', 'password1');
+		user = await registerUser('testUser', 'password1');
 		expect(user && typeof user === 'object').toBe(true);
 		expect(user).toHaveProperty('username', 'testUser');
 		expect(user).toHaveProperty('password');
@@ -23,18 +27,18 @@ describe('Tests for the User datalayer', () => {
 
 	test('registerUser returns Error when duplicate username is used', async () => {
 		await expect(async () => {
-			await userModel.registerUser('testUser', 'password1');
+			await registerUser('testUser', 'password1');
 		}).rejects.toThrow();
 	});
 
 	test('registerUser returns Error when no password is provided', async () => {
 		await expect(async () => {
-			await userModel.registerUser('testUser');
+			await registerUser('testUser');
 		}).rejects.toThrow();
 	});
 
 	test('getUserById returns the user obj from the DB using the user ID', async () => {
-		const _user = await userModel.getUserById(user.id);
+		const _user = await getUserById(user.id);
 		expect(_user && typeof _user === 'object').toBe(true);
 		expect(_user).toHaveProperty('username', 'testUser');
 		expect(_user).toHaveProperty('password');
@@ -43,19 +47,19 @@ describe('Tests for the User datalayer', () => {
 
 	test('getUserById returns Error when id is empty', async () => {
 		await expect(async () => {
-			await userModel.getUserByName('');
+			await getUserByName('');
 		}).rejects.toThrow();
 	});
 
 	test('getUserById returns Error when id is wrong', async () => {
 		const _userId = randomId(user);
 		await expect(async () => {
-			await userModel.getUserByName(_userId);
+			await getUserByName(_userId);
 		}).rejects.toThrow('USER NOT FOUND');
 	});
 
 	test('getUserByName returns the user obj from DB using the username', async () => {
-		const _user = await userModel.getUserByName('testUser');
+		const _user = await getUserByName('testUser');
 		expect(_user && typeof _user === 'object').toBe(true);
 		expect(_user).toHaveProperty('username', 'testUser');
 		expect(_user).toHaveProperty('password');
@@ -64,7 +68,7 @@ describe('Tests for the User datalayer', () => {
 
 	test('getUserByName returns ResourceError when not locating user', async () => {
 		await expect(async () => {
-			await userModel.getUserByName('testUser1');
+			await getUserByName('testUser1');
 		}).rejects.toThrow('USER NOT FOUND');
 	});
 });
