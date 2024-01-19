@@ -1,36 +1,11 @@
-const models = require('../models/index');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const errors = require('../middleware/errors/index');
-const initPassport = require('../middleware/passport.js');
-const passport = require('passport');
-
-initPassport(passport);
-
-exports.userAuth = (req, res, next) => {
-	passport.authenticate('jwt', { session: false }, (err, user) => {
-		if (err) {
-			return next(err);
-		}
-		if (!user) {
-			throw new errors.AuthError();
-		}
-		return next();
-	})(req, res, next);
-};
-
-exports.tokenAuth = (req, res, next) => {
-	passport.authenticate('refresh', function (err, user) {
-		if (err) {
-			return next(err);
-		}
-		return next();
-	})(req, res, next);
-};
+const UserService = require('./user');
 
 exports.loginUser = asyncHandler(async (username, password) => {
-	const user = await models.UserModel.getUserByName(username);
+	const user = await UserService.getUserByName(username);
 
 	const _password = await bcrypt.compare(password, user.password);
 

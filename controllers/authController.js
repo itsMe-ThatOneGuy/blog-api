@@ -14,14 +14,6 @@ exports.test_auth = (req, res, next) => {
 	}
 };
 
-exports.user_Auth = (req, res, next) => {
-	services.authServices.userAuth(req, res, next);
-};
-
-exports.token_Auth = (req, res, next) => {
-	services.authServices.tokenAuth(req, res, next);
-};
-
 exports.refresh = asyncHandler(async (req, res, next) => {
 	const { jwt } = req.cookies;
 
