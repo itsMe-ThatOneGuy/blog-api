@@ -5,11 +5,11 @@ const {
 	updateComment,
 	deleteComment,
 } = require('../../services/comments');
-const { UserModel } = require('../../models/index');
+const { UserModel, PostModel } = require('../../models/index');
 const { randomId } = require('../../utils/testUtils');
 
-describe('Tests for the Comment datalayer', () => {
-	let user;
+describe('Tests for the Comment service layer', () => {
+	let user, badUser;
 
 	beforeAll(async () => {
 		await mongodb.initializeMongoServer();
@@ -34,7 +34,7 @@ describe('Tests for the Comment datalayer', () => {
 		await mongodb.stopMongoServer();
 	});
 
-	let comment;
+	let testComment;
 
 	test('createComment creates a new comment', async () => {
 		const post = new PostModel({
@@ -51,6 +51,8 @@ describe('Tests for the Comment datalayer', () => {
 		);
 
 		const { comment, updatedPost } = resources;
+		testComment = comment;
+
 		expect(comment && typeof comment === 'object').toBe(true);
 		expect(comment).toHaveProperty('user');
 		expect(comment).toHaveProperty('body', 'test Comment body');
@@ -76,7 +78,7 @@ describe('Tests for the Comment datalayer', () => {
 	});
 
 	test('getSingleComment returns comment object from db using comment id', async () => {
-		const _comment = await getSingleComment(comment.id);
+		const _comment = await getSingleComment(testComment.id);
 		expect(_comment && typeof _comment === 'object').toBe(true);
 		expect(_comment).toHaveProperty('user');
 		expect(_comment).toHaveProperty('body', 'test Comment body');
@@ -90,7 +92,7 @@ describe('Tests for the Comment datalayer', () => {
 	});
 
 	test('getSingleComment throws error if id is incorrect', async () => {
-		const _commentId = randomId(comment);
+		const _commentId = randomId(testComment);
 		await expect(async () => {
 			await getSingleComment(_commentId);
 		}).rejects.toThrow('COMMENT NOT FOUND');
@@ -109,7 +111,7 @@ describe('Tests for the Comment datalayer', () => {
 	});
 
 	test('updateComment throws error if id is incorrect', async () => {
-		const _commentId = randomId(comment);
+		const _commentId = randomId(testComment);
 		await expect(async () => {
 			await updateComment(_commentId, user.id, 'Some rando str');
 		}).rejects.toThrow('COMMENT NOT FOUND');
