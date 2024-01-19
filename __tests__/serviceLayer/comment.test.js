@@ -37,11 +37,30 @@ describe('Tests for the Comment datalayer', () => {
 	let comment;
 
 	test('createComment creates a new comment', async () => {
-		comment = await createComment(user.id, 'test Comment body');
+		const post = new PostModel({
+			user: user.id,
+			title: 'TEST POST',
+			body: 'Test post body',
+		});
+		await post.save();
+
+		const resources = await createComment(
+			post.id,
+			user.id,
+			'test Comment body',
+		);
+
+		const { comment, updatedPost } = resources;
 		expect(comment && typeof comment === 'object').toBe(true);
 		expect(comment).toHaveProperty('user');
 		expect(comment).toHaveProperty('body', 'test Comment body');
 		expect(comment).toHaveProperty('commentDate');
+
+		expect(updatedPost && typeof updatedPost === 'object').toBe(true);
+		expect(updatedPost).toHaveProperty('user');
+		expect(updatedPost).toHaveProperty('title', 'TEST POST');
+		expect(updatedPost).toHaveProperty('body', 'Test post body');
+		expect(updatedPost).toHaveProperty('postDate');
 	});
 
 	test('createComment throws error if User is not provided', async () => {
