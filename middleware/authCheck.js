@@ -1,5 +1,5 @@
 const passport = require('passport');
-const initPassport = require('./passport');
+const initPassport = require('../config/passport');
 
 initPassport(passport);
 
