@@ -1,15 +1,13 @@
 const express = require('express');
-const TokenRouter = express.Router();
-const refreshAuth = require('./refreshAuth');
-const token = require('./token');
+const refreshRouter = express.Router();
+const { refreshToken } = require('./refreshToken');
 
-const initTokenRouter = (router) => {
-	refreshAuth.refreshAuth(router);
-	token.token(router);
+const initRefreshRouter = (router) => {
+	refreshToken(router);
 
 	return router;
 };
 
-initTokenRouter(TokenRouter);
+initRefreshRouter(refreshRouter);
 
-module.exports = TokenRouter;
+module.exports = refreshRouter;
