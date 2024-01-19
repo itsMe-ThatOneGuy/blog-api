@@ -20,6 +20,14 @@ describe('Tests for the Comment datalayer', () => {
 		});
 
 		await user.save();
+
+		badUser = new UserModel({
+			username: 'badUser',
+			password: 'password1',
+			isAdmin: true,
+		});
+
+		await badUser.save();
 	});
 
 	afterAll(async () => {
