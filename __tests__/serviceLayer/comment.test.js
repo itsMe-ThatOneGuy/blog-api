@@ -96,24 +96,22 @@ describe('Tests for the Comment datalayer', () => {
 		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 
-	test('updateComment takes a new body str and updates the comment with it', async () => {
-		const _comment = await updateComment(comment.id, user.id, 'updated');
-		expect(_comment && typeof _comment === 'object').toBe(true);
-		expect(_comment).toHaveProperty('user');
-		expect(_comment).toHaveProperty('body', 'updated');
-		expect(_comment).toHaveProperty('commentDate');
+	test('updateComment throws error if user attempting is not the one who made the comemnt', async () => {
+		await expect(async () => {
+			await updateComment(testComment.id, badUser.id, 'Some random str');
+		}).rejects.toThrow('NOT AUTHORIZED TO UPDATE COMMENT');
 	});
 
 	test('updateComment throws error if id is not provided', async () => {
 		await expect(async () => {
-			await updateComment('', 'Some random str');
-		}).rejects.toThrow();
+			await updateComment(undefined, user.id, 'Some random str');
+		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 
 	test('updateComment throws error if id is incorrect', async () => {
 		const _commentId = randomId(comment);
 		await expect(async () => {
-			await updateComment(_commentId, 'Some rando str');
+			await updateComment(_commentId, user.id, 'Some rando str');
 		}).rejects.toThrow('COMMENT NOT FOUND');
 	});
 
