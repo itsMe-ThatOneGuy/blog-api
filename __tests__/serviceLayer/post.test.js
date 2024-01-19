@@ -66,10 +66,31 @@ describe('Tests for Post datalayer', () => {
 		}).rejects.toThrow('POST NOT FOUND');
 	});
 
-	test('updatePost takes a new tite or body and used to update a post', async () => {
-		console.log('NEED TO WRITE TESTS FOR updatePost after reworking it');
+	test('updatePost takes a new title and updates the selected post', async () => {
+		const _post = await updatePost(post.id, 'NEW TITLE', undefined);
+		expect(_post && typeof post === 'object').toBe(true);
+		expect(_post).toHaveProperty('user');
+		expect(_post).toHaveProperty('title', 'NEW TITLE');
+		expect(_post).toHaveProperty('body', 'This is the post body');
+		expect(_post).toHaveProperty('comments');
+		expect(_post).toHaveProperty('postDate');
+		expect(_post).toHaveProperty('isPublished', false);
 	});
-	//WRITE ERRORS
+
+	test('updatePost takes a new body and updates the selected post', async () => {
+		const _post = await updatePost(
+			post.id,
+			undefined,
+			'This is the updated post body',
+		);
+		expect(_post && typeof post === 'object').toBe(true);
+		expect(_post).toHaveProperty('user');
+		expect(_post).toHaveProperty('title', 'NEW TITLE');
+		expect(_post).toHaveProperty('body', 'This is the updated post body');
+		expect(_post).toHaveProperty('comments');
+		expect(_post).toHaveProperty('postDate');
+		expect(_post).toHaveProperty('isPublished', false);
+	});
 
 	test('changePublished', async () => {
 		const _post = await changePublished(post.id, true);
