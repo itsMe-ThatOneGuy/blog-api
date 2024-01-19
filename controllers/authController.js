@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const services = require('../services/index');
+const { authServices } = require('../services/index');
 
 exports.test_auth = (req, res, next) => {
 	try {
@@ -18,7 +18,7 @@ exports.refresh = asyncHandler(async (req, res, next) => {
 	const { jwt } = req.cookies;
 
 	try {
-		const accessToken = await services.authServices.refresh(jwt);
+		const accessToken = await authServices.refresh(jwt);
 
 		return res.status(200).json({
 			success: true,
@@ -35,7 +35,7 @@ exports.login_user = asyncHandler(async (req, res, next) => {
 	const { username, password } = req.body;
 
 	try {
-		const { accessToken, refreshToken } = await services.authServices.loginUser(
+		const { accessToken, refreshToken } = await authServices.loginUser(
 			username,
 			password,
 		);

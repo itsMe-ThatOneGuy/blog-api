@@ -1,7 +1,7 @@
-const controllers = require('../controllers/index');
+const { userAuth } = require('../middleware/authCheck.js');
 
 const authentication = (router) => {
-	router.all('*', controllers.authController.user_Auth);
+	router.all('*', userAuth);
 
 	return router;
 };

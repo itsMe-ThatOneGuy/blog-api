@@ -1,11 +1,11 @@
 const express = require('express');
 const PublicRouter = express.Router();
-const posts = require('./posts');
-const user = require('./user');
+const { postsPublic } = require('./posts');
+const { userPublic } = require('./user');
 
 const initPublicRouter = (router) => {
-	posts.postsPublic(router);
-	user.userPublic(router);
+	postsPublic(router);
+	userPublic(router);
 
 	return router;
 };
