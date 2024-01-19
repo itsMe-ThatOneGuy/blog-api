@@ -1,7 +1,7 @@
 const mongodb = require('../../config/mongoConfigTesting');
 const {
 	allPosts,
-	createPosts,
+	createPost,
 	getSinglePost,
 	updatePost,
 	deletePost,
@@ -10,7 +10,7 @@ const {
 const { UserModel, CommentModel } = require('../../models/index');
 const { randomId } = require('../../utils/testUtils');
 
-describe('Tests for Post datalayer', () => {
+describe('Tests for Post service layer', () => {
 	beforeAll(async () => {
 		await mongodb.initializeMongoServer();
 	});
@@ -27,7 +27,7 @@ describe('Tests for Post datalayer', () => {
 	let post;
 
 	test('createPost creates a new post', async () => {
-		post = await createPosts(user.id, 'POST TITLE', 'This is the post body');
+		post = await createPost(user.id, 'POST TITLE', 'This is the post body');
 		expect(post && typeof post === 'object').toBe(true);
 		expect(post).toHaveProperty('user');
 		expect(post).toHaveProperty('title', 'POST TITLE');
@@ -96,8 +96,8 @@ describe('Tests for Post datalayer', () => {
 		const _post = await changePublished(post.id, true);
 		expect(_post && typeof post === 'object').toBe(true);
 		expect(_post).toHaveProperty('user');
-		expect(_post).toHaveProperty('title', 'POST TITLE');
-		expect(_post).toHaveProperty('body', 'This is the post body');
+		expect(_post).toHaveProperty('title', 'NEW TITLE');
+		expect(_post).toHaveProperty('body', 'This is the updated post body');
 		expect(_post).toHaveProperty('comments');
 		expect(_post).toHaveProperty('postDate');
 		expect(_post).toHaveProperty('isPublished', true);
@@ -120,8 +120,8 @@ describe('Tests for Post datalayer', () => {
 		const _post = await deletePost(post.id);
 		expect(_post && typeof post === 'object').toBe(true);
 		expect(_post).toHaveProperty('user');
-		expect(_post).toHaveProperty('title', 'POST TITLE');
-		expect(_post).toHaveProperty('body', 'This is the post body');
+		expect(_post).toHaveProperty('title', 'NEW TITLE');
+		expect(_post).toHaveProperty('body', 'This is the updated post body');
 		expect(_post).toHaveProperty('comments');
 		expect(_post).toHaveProperty('isPublished', true);
 		expect(_post).toHaveProperty('postDate');

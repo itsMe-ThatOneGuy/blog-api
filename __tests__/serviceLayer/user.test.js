@@ -6,7 +6,7 @@ const {
 } = require('../../services/user');
 const { randomId } = require('../../utils/testUtils');
 
-describe('Tests for the User datalayer', () => {
+describe('Tests for the User service layer', () => {
 	beforeAll(async () => {
 		await mongodb.initializeMongoServer();
 	});
