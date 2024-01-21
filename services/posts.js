@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const errors = require('../middleware/errors/index');
-const { PostModel } = require('../models/index');
+const { PostModel, CommentModel } = require('../models/index');
 
 const allPosts = asyncHandler(async () => {
 	return await PostModel.find({})
@@ -11,7 +11,7 @@ const allPosts = asyncHandler(async () => {
 		});
 });
 
-const createPosts = asyncHandler(async (sub, title, body) => {
+const createPost = asyncHandler(async (sub, title, body) => {
 	const post = new PostModel({
 		user: sub,
 		title: title,
@@ -35,17 +35,14 @@ const getSinglePost = asyncHandler(async (id) => {
 	return post;
 });
 
-//I MIGHT NEED TO REWORK THIS
 const updatePost = asyncHandler(async (id, title, body) => {
-	//MOVE TO AN ADMIN CHECK
-	/* if (!admin)
-        throw new errors.PermissionError('NOT AUTHORIZED TO UPDATE POSTS');
-*/
 	await getSinglePost(id);
 
 	return await PostModel.findByIdAndUpdate(
 		id,
-		{ $set: { title: title, body: body } },
+		{
+			$set: { title: title, body: body },
+		},
 		{ new: true },
 	)
 		.populate('user', 'username')
@@ -56,10 +53,11 @@ const updatePost = asyncHandler(async (id, title, body) => {
 });
 
 const deletePost = asyncHandler(async (id) => {
-	//MOVE TO ADMIN CHECk
-	/* if (!admin)
-        throw new errors.PermissionError('NOT AUTHORIZED TO DELETE POSTS'); */
-	await getSinglePost(id);
+	const post = await getSinglePost(id);
+
+	post.comments.forEach(async (comment) => {
+		await CommentModel.findOneAndDelete(comment._id);
+	});
 
 	return await PostModel.findByIdAndDelete(id)
 		.populate('user', 'username')
@@ -70,12 +68,6 @@ const deletePost = asyncHandler(async (id) => {
 });
 
 const changePublished = async (id, status) => {
-	//MOVE TO ADMIN CHECk
-	/* if (!admin)
-        throw new errors.PermissionError(
-            'NOT AUTHORIZED TO CHANGE POST PUBLISH STATUS',
-        ); */
-
 	await getSinglePost(id);
 
 	return await PostModel.findByIdAndUpdate(
@@ -108,7 +100,7 @@ const updatePostComments = asyncHandler(async (postId, commentId) => {
 
 module.exports = {
 	allPosts,
-	createPosts,
+	createPost,
 	getSinglePost,
 	updatePost,
 	deletePost,
