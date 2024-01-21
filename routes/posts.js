@@ -1,6 +1,7 @@
 const controllers = require('../controllers/index');
 const idTypeCheck = require('../middleware/idTypeCheck');
 const validator = require('../middleware/validators/index');
+const adminCheck = require('../middleware/adminCheck');
 
 const postsPublic = (router) => {
 	router.get('/posts', controllers.postController.get_all_posts);
@@ -29,6 +30,7 @@ const postsPublic = (router) => {
 const postsPrivate = (router) => {
 	router.post(
 		'/posts',
+		adminCheck,
 		validator.titleValidator(),
 		validator.bodyValidator(),
 		validator.validate,
@@ -37,6 +39,7 @@ const postsPrivate = (router) => {
 
 	router.put(
 		'/posts/:postId',
+		adminCheck,
 		idTypeCheck,
 		/* validator.titleValidator(),
         validator.bodyValidator(),
@@ -46,12 +49,14 @@ const postsPrivate = (router) => {
 
 	router.delete(
 		'/posts/:postId',
+		adminCheck,
 		idTypeCheck,
 		controllers.postController.delete_post,
 	);
 
 	router.put(
 		'/posts/:postId/published',
+		adminCheck,
 		idTypeCheck,
 		validator.publishValidator(),
 		validator.validate,
