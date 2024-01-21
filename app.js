@@ -7,7 +7,7 @@ const helmet = require('helmet');
 
 const ErrorHandler = require('./middleware/ErrorHandler');
 const errors = require('./middleware/errors/index');
-const models = require('./models/index');
+const { connectToDatabase } = require('./config/mongoConfig');
 const routes = require('./routes/index');
 
 const app = express();
@@ -15,7 +15,7 @@ app.disable('x-powered-by');
 app.use(helmet());
 app.use(compression());
 
-models.connectToDatabase();
+connectToDatabase();
 
 app.use(logger('dev'));
 app.use(express.json());
