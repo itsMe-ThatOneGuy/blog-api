@@ -128,7 +128,7 @@ describe('Tests for the Comment service layer', () => {
 	test('deleteComment throws error if user is not valid', async () => {
 		await expect(async () => {
 			await deleteComment(testComment.id, badUser.id, false);
-		}).rejects.toThrow('NOT AUTHORIZED DELETE COMMENT');
+		}).rejects.toThrow('NOT AUTHORIZED TO DELETE COMMENT');
 	});
 
 	test('deleteComment throws error if id is not provided', async () => {
