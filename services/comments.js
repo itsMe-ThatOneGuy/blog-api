@@ -1,19 +1,31 @@
 const asyncHandler = require('express-async-handler');
 const errors = require('../middleware/errors/index');
 const { CommentModel } = require('../models/index');
+const postServices = require('./posts');
 
-//REWORK
-const createComment = asyncHandler(async (sub, body) => {
+const validateUser = asyncHandler(async (comment, sub, admin) => {
+	if (admin === undefined) {
+		if (comment.user.id !== sub) throw new errors.PermissionError();
+	} else {
+		if (comment.user.id !== sub && !admin)
+			throw new errors.PermissionError('NOT AUTHORIZED TO DELETE COMMENT');
+	}
+});
+
+const createComment = asyncHandler(async (id, sub, body) => {
+	const post = await postServices.getSinglePost(id);
 	const comment = new CommentModel({
 		user: sub,
 		body: body,
 	});
 	await comment.save();
 
-	//post.comments.push(comment);
-	//const updatedPost = await post.save();
+	post.comments.push(comment);
+	await postServices.updatePostComments(post._id, comment._id);
 
-	return comment; //updatedPost };
+	const updatedPost = await post.save();
+
+	return { comment, updatedPost };
 });
 
 const getSingleComment = asyncHandler(async (id) => {
@@ -39,19 +51,11 @@ const updateComment = asyncHandler(async (id, sub, body) => {
 const deleteComment = asyncHandler(async (id, sub, admin) => {
 	const comment = await getSingleComment(id);
 
-	if (comment.user.id !== sub || !admin)
+	if (comment.user.id !== sub && !admin) {
 		throw new errors.PermissionError('NOT AUTHORIZED TO DELETE COMMENT');
+	}
 
 	return await CommentModel.findByIdAndDelete(id).populate('user', 'username');
-});
-
-//REWORK
-const deleteAllPostComments = asyncHandler(async (post) => {
-	if (post.comments.length !== 0) {
-		post.comments.forEach(async (comment) => {
-			await Comment.findByIdAndDelete(comment._id);
-		});
-	}
 });
 
 module.exports = {
@@ -59,5 +63,4 @@ module.exports = {
 	getSingleComment,
 	updateComment,
 	deleteComment,
-	deleteAllPostComments,
 };
