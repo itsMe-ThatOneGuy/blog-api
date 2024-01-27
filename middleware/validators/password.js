@@ -14,7 +14,7 @@ const passwordValidator = () => {
 			.bail()
 			.trim()
 			.escape(),
-		body('confirm-password')
+		body('confirmPassword')
 			.custom((confirmPassword, { req }) => {
 				return req.body.password === confirmPassword;
 			})
