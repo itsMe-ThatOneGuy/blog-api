@@ -36,12 +36,11 @@ describe('Test for the User controller', () => {
 		expect(response.body.user).toHaveProperty('isAdmin', false);
 	});
 
-	test('Should throw error if nothing is sent with request', async () => {
+	test('Should throw error if username && password is not sent with request', async () => {
 		const response = await request(app)
 			.post('/user/register')
 			.type('form')
 			.send({});
-		console.log(response.body);
 
 		expect(response.body).toHaveProperty('success', false);
 		expect(response.body).toHaveProperty('message');
@@ -49,5 +48,50 @@ describe('Test for the User controller', () => {
 		expect(response.body.message[1]).toBe(
 			'PASSWORD MUST CONTAIN AT LEAST 8 CHARACTERS',
 		);
+	});
+
+	test('Should throw error if username is already taken', async () => {
+		const response = await request(app)
+			.post('/user/register')
+			.type('form')
+			.send({
+				username: 'testuser',
+				password: 'Password1',
+				confirmPassword: 'Password1',
+			});
+
+		expect(response.body).toHaveProperty('success', false);
+		expect(response.body).toHaveProperty('message');
+		expect(response.body.message[0]).toBe('USERNAME ALREADY TAKEN');
+	});
+
+	test('Should throw error if password does not validate', async () => {
+		const response = await request(app)
+			.post('/user/register')
+			.type('form')
+			.send({
+				username: 'testuser1',
+				password: 'Password',
+				confirmPassword: 'Password',
+			});
+
+		expect(response.body).toHaveProperty('success', false);
+		expect(response.body).toHaveProperty('message');
+		expect(response.body.message[0]).toBe('PASSWORD MUST CONTAIN A NUMBER');
+	});
+
+	test('Should throw error if password does not validate', async () => {
+		const response = await request(app)
+			.post('/user/register')
+			.type('form')
+			.send({
+				username: 'testuser1',
+				password: 'Password1',
+				confirmPassword: 'Password',
+			});
+
+		expect(response.body).toHaveProperty('success', false);
+		expect(response.body).toHaveProperty('message');
+		expect(response.body.message[0]).toBe('PASSWORDS MUST MATCH');
 	});
 });
