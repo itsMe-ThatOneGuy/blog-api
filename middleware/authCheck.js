@@ -1,5 +1,6 @@
 const passport = require('passport');
 const initPassport = require('../config/passport');
+const errors = require('../middleware/errors');
 
 initPassport(passport);
 
